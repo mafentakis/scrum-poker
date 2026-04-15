@@ -17,6 +17,17 @@
              (ngModelChange)="registerError=''"
              placeholder="Your name" autocomplete="off"
              [class.reg-input-error]="registerError">
+
+      <!-- Avatar picker -->
+      <label class="reg-avatar-btn" matTooltip="Pick a profile photo">
+        @if (registerAvatar) {
+          <img class="reg-avatar-preview" [src]="registerAvatar" alt="avatar">
+        } @else {
+          <mat-icon>add_a_photo</mat-icon>
+        }
+        <input type="file" accept="image/*" style="display:none" (change)="onAvatarSelected($event)">
+      </label>
+
       <label class="reg-sm">
         <input type="checkbox" [(ngModel)]="registerAsSM"> as scrum master
       </label>
@@ -160,7 +171,11 @@
               @if (cardsRevealed && p.voted) {
                 <span class="pc-value">{{ p.value }}</span>
               } @else if (p.voted) {
-                <mat-icon class="pc-check">check</mat-icon>
+                @if (p.avatar) {
+                  <img class="pc-avatar" [src]="p.avatar" alt="">
+                } @else {
+                  <mat-icon class="pc-check">check</mat-icon>
+                }
               } @else {
                 <span class="pc-unknown">?</span>
               }

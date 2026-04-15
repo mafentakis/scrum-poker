@@ -286,6 +286,13 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As any participant**, hovering a miss badge shows a tooltip "Missed N deadline(s)".
 - **As any participant**, miss counts survive new rounds and only reset on server restart.
 
+### Profile Avatar
+
+- **As a user**, I can optionally upload a profile photo at registration (camera icon button) — so my personality shows on the table.
+- **As a participant**, when I have voted but cards are not yet revealed, my avatar photo fills my card face — so teammates see who voted without knowing the value.
+- **As a participant**, my avatar is stored in `localStorage` and automatically re-used in future sessions — so I only need to set it once.
+- **As any participant**, I see other teammates' avatars on their hidden cards — so the team strip is more personal and fun.
+
 ### Layout & PWA
 
 - **As a user**, the app runs in a fixed **120 px compact strip** that sits above any other window — so it stays visible while the team is in a Zoom call or Jira.

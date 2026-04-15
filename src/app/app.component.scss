@@ -51,6 +51,31 @@
   &:focus { border-color: #5c35b5; }
 }
 
+.reg-avatar-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px dashed #bdbdbd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: border-color 0.15s;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; color: #9e9e9e; }
+
+  &:hover { border-color: #5c35b5; mat-icon { color: #5c35b5; } }
+}
+
+.reg-avatar-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .reg-sm {
   display: flex;
   align-items: center;
@@ -439,6 +464,12 @@
     .pc-unknown { font-size: 1.1rem; color: #bdbdbd; }
     .pc-check   { color: white; font-size: 22px; height: 22px; width: 22px; }
     .pc-value   { font-size: 1.1rem; font-weight: 700; color: #4527a0; }
+    .pc-avatar  {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+    }
   }
 
   .pc-name {

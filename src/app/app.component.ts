@@ -17,6 +17,7 @@ export interface Participant {
   voted: boolean;
   value: string | null;
   isSM: boolean;
+  avatar?: string;
 }
 
 interface ServerState {
@@ -60,6 +61,7 @@ export class AppComponent implements OnInit, OnDestroy {
   registerName  = '';
   registerRoom  = '';
   registerAsSM  = false;
+  registerAvatar = '';   // base64 JPEG picked at registration
   userName      = '';
   roomName      = '';
   isScrumMaster = false;
@@ -129,8 +131,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.userName      = data.name;
         this.roomName      = data.room  ?? '';
         this.isScrumMaster = data.isSM  ?? false;
-        this.registerName  = data.name;   // pre-fill form for next time
+        this.registerName  = data.name;
         this.registerRoom  = data.room  ?? '';
+        this.registerAvatar = localStorage.getItem('scrumPokerAvatar') ?? '';
         this.isRegistered  = !!(data.name && data.room);
       } catch {
         localStorage.removeItem('scrumPokerUser');
@@ -157,7 +160,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.zone.run(() => {
         this.connected = true;
         if (this.isRegistered) {
-          this.send({ type: 'join', room: this.roomName, name: this.userName, isSM: this.isScrumMaster });
+          this.send({ type: 'join', room: this.roomName, name: this.userName, isSM: this.isScrumMaster, avatar: this.registerAvatar });
         }
       });
     };
@@ -272,6 +275,28 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // ── Registration ──────────────────────────────────────
 
+  onAvatarSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const SIZE = 64;
+        const canvas = document.createElement('canvas');
+        canvas.width = SIZE; canvas.height = SIZE;
+        const ctx = canvas.getContext('2d')!;
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width  - side) / 2;
+        const sy = (img.height - side) / 2;
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, SIZE, SIZE);
+        this.registerAvatar = canvas.toDataURL('image/jpeg', 0.8);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
   register(): void {
     const name = this.registerName.trim();
     const room = this.registerRoom.trim();
@@ -281,8 +306,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.roomName      = room;
     this.isScrumMaster = this.registerAsSM;
     this.isRegistered  = true;
+    if (this.registerAvatar) localStorage.setItem('scrumPokerAvatar', this.registerAvatar);
     localStorage.setItem('scrumPokerUser', JSON.stringify({ name, room, isSM: this.isScrumMaster }));
-    this.send({ type: 'join', room, name, isSM: this.isScrumMaster });
+    this.send({ type: 'join', room, name, isSM: this.isScrumMaster, avatar: this.registerAvatar });
   }
 
   logout(): void {

@@ -53,7 +53,7 @@ setInterval(() => {
 
 function snapshot(room) {
   return {
-    participants: room.participants.map(p => ({ ...p })),
+    participants: room.participants.map(p => ({ name: p.name, voted: p.voted, value: p.value, isSM: p.isSM, avatar: p.avatar ?? '' })),
     cardsRevealed: room.cardsRevealed,
     timerDuration: room.timerDuration,
     timerRemaining: room.timerRemaining,
@@ -179,11 +179,16 @@ wss.on('connection', (ws) => {
 
         const room = getOrCreateRoom(roomName);
         if (!room.createdBy) room.createdBy = participantName; // first joiner is the creator
+        const avatar = typeof msg.avatar === 'string' && msg.avatar.startsWith('data:image/')
+          ? msg.avatar.slice(0, 32_000)  // cap at ~32 KB
+          : '';
+
         const existing = room.participants.find(p => p.name === participantName);
         if (existing) {
-          existing.isSM = existing.isSM || isSM; // keep SM flag if already set
+          existing.isSM = existing.isSM || isSM;
+          if (avatar) existing.avatar = avatar;  // update avatar on reconnect
         } else {
-          room.participants.push({ name: participantName, voted: false, value: null, isSM });
+          room.participants.push({ name: participantName, voted: false, value: null, isSM, avatar });
         }
 
         ws.send(JSON.stringify({ type: 'state', data: snapshot(room) }));
