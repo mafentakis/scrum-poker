@@ -397,6 +397,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.25s ease;
+    position: relative;
 
     .pc-unknown { font-size: 1.1rem; color: #bdbdbd; }
     .pc-check   { color: white; font-size: 22px; height: 22px; width: 22px; }
@@ -449,12 +450,11 @@
 
 .miss-badge {
   position: absolute;
-  bottom: 13px;
-  right: -7px;
-  font-size: 0.75rem;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.65rem;
   line-height: 1;
   cursor: default;
-  z-index: 1;
 }
 
 // ── Average chip ──────────────────────────────────────

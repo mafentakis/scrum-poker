@@ -159,16 +159,14 @@
               } @else {
                 <span class="pc-unknown">?</span>
               }
+              @if (missCount[p.name]) {
+                <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">{{ missEmoji(missCount[p.name]) }}</span>
+              }
             </div>
             <span class="pc-name">
               {{ p.name }}
               @if (p.isSM) { <mat-icon class="pc-star">star</mat-icon> }
             </span>
-            @if (missCount[p.name]) {
-              <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">
-                {{ missEmoji(missCount[p.name]) }}
-              </span>
-            }
           </div>
         }
 
