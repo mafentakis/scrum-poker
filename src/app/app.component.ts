@@ -287,7 +287,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.send({ type: 'vote', value });
   }
 
-  kickParticipant(name: string): void { this.send({ type: 'kick', target: name }); }
+  kickParticipant(name: string): void {
+    if (!confirm(`Remove "${name}" from the session?`)) return;
+    this.send({ type: 'kick', target: name });
+  }
 
   revealCards(): void { this.send({ type: 'reveal' }); }
 
