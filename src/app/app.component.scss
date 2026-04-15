@@ -102,10 +102,43 @@
   flex-direction: column;
   height: 120px;
   overflow: hidden;
+  position: relative;
 
   &.expanded {
     height: 100vh;
   }
+}
+
+.offline-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+
+  .offline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef5350;
+    animation: pulse-dot 1.2s ease-in-out infinite;
+  }
+
+  .offline-msg {
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
 }
 
 .top-layout {
