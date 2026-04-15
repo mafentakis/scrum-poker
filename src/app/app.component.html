@@ -138,9 +138,10 @@
       <button mat-icon-button (click)="logout()" matTooltip="Leave session">
         <mat-icon>logout</mat-icon>
       </button>
-      <a mat-icon-button href="/assets/help.html" target="_blank" rel="noopener" matTooltip="Help">
+      <button mat-icon-button matTooltip="Help"
+              (click)="openHelp()">
         <mat-icon>help_outline</mat-icon>
-      </a>
+      </button>
     </mat-toolbar>
 
     <!-- ── Cards + Team strip ────────────────────────────── -->

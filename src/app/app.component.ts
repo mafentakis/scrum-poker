@@ -311,6 +311,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.send({ type: 'join', room, name, isSM: this.isScrumMaster, avatar: this.registerAvatar });
   }
 
+  openHelp(): void {
+    window.open('/assets/help.html', 'scrumHelp',
+      'width=960,height=700,resizable=yes,scrollbars=yes');
+  }
+
   logout(): void {
     this.send({ type: 'leave' });          // server removes participant immediately
     localStorage.removeItem('scrumPokerUser');
