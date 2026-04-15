@@ -215,8 +215,12 @@
     align-items: center;
     gap: 2px;
     flex-shrink: 0;
+  }
 
-    button { vertical-align: middle; }
+  .tb-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .tb-divider {
