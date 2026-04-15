@@ -149,6 +149,7 @@
                [class.pc-voted]="p.voted"
                [class.pc-revealed]="cardsRevealed"
                [class.pc-alert]="nonVoterAlert && !p.voted"
+               [class.pc-me]="p.name === userName"
                [class.pc-kickable]="isScrumMaster && p.name !== userName"
                (click)="isScrumMaster && p.name !== userName ? kickParticipant(p.name) : null"
                [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' — click to remove' : (p.isSM ? p.name + ' (SM)' : p.name)">
