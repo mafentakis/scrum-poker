@@ -53,7 +53,7 @@ setInterval(() => {
 
 function snapshot(room) {
   return {
-    participants: room.participants.map(p => ({ name: p.name, voted: p.voted, value: p.value, isSM: p.isSM, avatar: p.avatar ?? '' })),
+    participants: room.participants.map(p => ({ name: p.name, voted: p.voted, value: p.value, isSM: p.isSM, avatar: p.avatar ?? '', online: p.online !== false })),
     cardsRevealed: room.cardsRevealed,
     timerDuration: room.timerDuration,
     timerRemaining: room.timerRemaining,
@@ -185,10 +185,11 @@ wss.on('connection', (ws) => {
 
         const existing = room.participants.find(p => p.name === participantName);
         if (existing) {
-          existing.isSM = existing.isSM || isSM;
+          existing.isSM   = existing.isSM || isSM;
+          existing.online = true;
           if (avatar) existing.avatar = avatar;  // update avatar on reconnect
         } else {
-          room.participants.push({ name: participantName, voted: false, value: null, isSM, avatar });
+          room.participants.push({ name: participantName, voted: false, value: null, isSM, avatar, online: true });
         }
 
         ws.send(JSON.stringify({ type: 'state', data: snapshot(room) }));
@@ -321,6 +322,13 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     const { roomName, participantName } = ws;
     if (!roomName || !participantName) return;
+
+    // Mark participant as offline immediately so the team sees it during grace period
+    const roomOnClose = rooms.get(roomName);
+    if (roomOnClose) {
+      const p = roomOnClose.participants.find(p => p.name === participantName);
+      if (p) { p.online = false; broadcastRoom(roomName, { type: 'state', data: snapshot(roomOnClose) }); }
+    }
 
     // Give the client DISCONNECT_GRACE_MS to reconnect (page refresh, brief blip).
     // If they don't come back in time, remove them from the room.

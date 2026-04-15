@@ -43,7 +43,7 @@ Role is self-selected at registration (no authentication required).
 | Event | Behaviour |
 |---|---|
 | Join (WS `join` message) | Added to room if not present; reconnected if name already exists |
-| Page refresh / network blip | WS closes; participant **stays** for a 30 s grace period — reconnects on reload, timer cancelled |
+| Page refresh / network blip | WS closes; participant **stays** for a 30 s grace period — card immediately dims and shows "offline"; reconnects on reload |
 | No reconnect within 30 s | Participant **automatically removed** from room and team strip updated |
 | Logout (WS `leave` message) | Participant **removed** from room immediately |
 | Server restart | All rooms and participants lost (in-memory only) |
@@ -194,10 +194,20 @@ Pre-fills the registration form on reload. Cleared on logout.
 - **Framework**: Angular 17 standalone components (`@if`/`@for` control flow).
 - **UI library**: Angular Material 17 + custom SCSS.
 - **Audio**: Web Audio API — gracefully silent if blocked.
-- **Connection indicator**: Coloured dot in toolbar (green = connected, red = reconnecting).
+- **Connection indicator**: Monochrome dot in toolbar (grey = connected, red = reconnecting). No green — keeps the toolbar quiet.
 - **Reconnection**: Auto-reconnects every 2 s after WS close; sends `join` on reconnect.
 - **Browser support**: Modern browsers (Chrome, Firefox, Edge, Safari).
 - **Dev startup**: `npm run dev` starts Angular (port 4200) and Node.js (port 3000) concurrently.
+
+## Design System
+
+- **Color philosophy**: Minimalistic and professional — almost no color. Accent is charcoal, not a brand hue.
+- **Primary accent**: `#374151` (charcoal) / `#1F2937` (near-black) / `#F3F4F6` (light grey surface)
+- **Toolbar background**: `#f5f5f5` — light, quiet, low-contrast
+- **Voted card fill**: `#1F2937` dark charcoal (signals commitment without distracting color)
+- **Timer warning**: `#ef6c00` orange (≤ 30 s) → `#c62828` red + pulse (≤ 10 s) — the only intentional color moments
+- **Ghost actions**: Secondary toolbar icons at `rgba(0,0,0,0.28)`, full opacity on hover — reduce visual noise at rest
+- **No progress bar** — removed; timer state communicated by MM:SS color alone
 
 ---
 
@@ -227,7 +237,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - Password-protected rooms.
 - Story title / issue summary editable field.
 - Voting history / round log.
-- PWA offline support (Tier 1: app-shell cache; Tier 2: offline overlay).
+- PWA offline support (Tier 1: app-shell cache — service worker).
 - Export results (CSV, clipboard).
 - Dark mode.
 
@@ -299,4 +309,21 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As a user**, the app runs in a fixed **120 px compact strip** that sits above any other window — so it stays visible while the team is in a Zoom call or Jira.
 - **As a user**, I can install the app as a PWA and it runs in a fixed 120 px window — the expand/collapse toggle was removed for simplicity.
 - **As a user**, I can install the app as a PWA from Chrome's address bar — so it opens as a standalone window without browser chrome.
-- **As a user**, a coloured dot in the toolbar shows my WebSocket connection status (green = connected, red = reconnecting) — so I know if I'm live with the room.
+- **As a user**, a monochrome dot in the toolbar shows my WebSocket connection status (grey = connected, red = reconnecting) — so I know if I'm live without a distracting green light at rest.
+- **As a user**, when I lose internet I see a clear "Offline — reconnecting…" overlay rather than a frozen screen — so I know the app is trying to reconnect.
+- **As a user**, when I'm offline the room meta line shows "· offline" in red — so I can tell at a glance the session is disconnected without needing to find the status dot.
+- **As any participant**, when a teammate (including the Scrum Master) disconnects, their card is immediately dimmed and shows "offline" in red below their name — so the team knows they are in the 30 s grace period and not yet removed.
+
+### Timer
+
+- **As any participant**, after the countdown hits zero the timer briefly shows the elapsed overtime (`+1s` → `+10s`) in blinking red for 10 seconds — so latecomers can see how far over time we are. It stops automatically and clears on reset or new round.
+
+### Visual Design
+
+- **As a user**, the toolbar is quiet and low-contrast (`#f5f5f5` background, ghost icons) — so the UI stays out of the way during a meeting and doesn't compete with the content.
+- **As a user**, secondary toolbar actions (Leave, Share, Help) are small ghost icons (28 px, appear on hover) grouped in a right cluster with consistent spacing — so the toolbar has clear visual hierarchy without clutter.
+- **As a user**, voted cards fill with dark charcoal (`#1F2937`) rather than a brand color — so the signal is clear without visual noise.
+- **As a user**, the timer is the only element that earns color (orange → red) — so urgent moments stand out against an otherwise monochrome UI.
+- **As a user**, the room name is shown as plain text (no redundant icon) — so the toolbar reads cleanly left-to-right.
+- **As a user**, the Scrum Master is not marked with a star badge — the "created by" line in the room meta already identifies who owns the session, avoiding duplication.
+- **As a user**, participant names that are too long wrap to a second line rather than being truncated with an ellipsis — so full names are always readable.

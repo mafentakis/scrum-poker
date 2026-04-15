@@ -53,9 +53,9 @@
     <mat-toolbar class="app-toolbar">
       <mat-icon class="toolbar-logo" matTooltip="Scrum Poker">style</mat-icon>
       <span class="toolbar-room">
-        <mat-icon>meeting_room</mat-icon>{{ roomName }}
+        {{ roomName }}
         @if (roomCreatedBy) {
-          <span class="room-meta">created by {{ roomCreatedBy }} · {{ roomCreatedAgo }}</span>
+          <span class="room-meta">created by {{ roomCreatedBy }} · {{ roomCreatedAgo }}@if (!connected) {<span class="room-meta-offline"> · offline</span>}</span>
         }
       </span>
 
@@ -64,7 +64,11 @@
       <!-- Timer: time + SM controls or participant hint -->
       @if (isScrumMaster) {
         <div class="timer-widget">
-          <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
+          @if (postTimerElapsed > 0) {
+            <span class="bar-time bar-time-overtime">+{{ postTimerElapsed }}s</span>
+          } @else {
+            <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
+          }
 
           <!-- Single toggle button -->
           <button mat-icon-button class="bar-btn timer-toggle"
@@ -107,7 +111,11 @@
 
         <span class="toolbar-sep"></span>
       } @else {
-        <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
+        @if (postTimerElapsed > 0) {
+          <span class="bar-time bar-time-overtime">+{{ postTimerElapsed }}s</span>
+        } @else {
+          <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
+        }
         <span class="tb-divider"></span>
         <span class="voted-hint">
           @if (!cardsRevealed) {
@@ -118,29 +126,33 @@
         </span>
       }
 
-      <span class="tb-divider"></span>
-      @if (isScrumMaster) {
-        <span class="sm-badge"><mat-icon>star</mat-icon>SM</span>
-      }
-      <span class="user-chip">
-        @if (registerAvatar) {
-          <img class="user-avatar" [src]="registerAvatar" alt="">
-        } @else {
-          <mat-icon>account_circle</mat-icon>
-        }
-        {{ userName }}
-      </span>
-      <span class="conn-dot" [class.conn-on]="connected" [matTooltip]="connected ? 'Connected' : 'Reconnecting…'"></span>
-      <button mat-icon-button (click)="logout()" matTooltip="Leave session">
-        <mat-icon>logout</mat-icon>
-      </button>
-      <button mat-icon-button class="share-btn" (click)="shareRoom()" matTooltip="Copy invite link">
-        <mat-icon>share</mat-icon>
-      </button>
-      <button mat-icon-button matTooltip="Help"
-              (click)="openHelp()">
-        <mat-icon>help_outline</mat-icon>
-      </button>
+      <div class="toolbar-right">
+        <span class="tb-divider"></span>
+        <span class="user-chip">
+          @if (registerAvatar) {
+            <img class="user-avatar" [src]="registerAvatar" alt="">
+          } @else {
+            <mat-icon>account_circle</mat-icon>
+          }
+          {{ userName }}
+        </span>
+        <span class="conn-dot" [class.conn-on]="connected" [matTooltip]="connected ? 'Connected' : 'Reconnecting…'"></span>
+        <div class="tb-action">
+          <button mat-icon-button (click)="logout()" matTooltip="Leave session">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+        <div class="tb-action">
+          <button mat-icon-button class="share-btn" (click)="shareRoom()" matTooltip="Copy invite link">
+            <mat-icon>share</mat-icon>
+          </button>
+        </div>
+        <div class="tb-action">
+          <button mat-icon-button matTooltip="Help" (click)="openHelp()">
+            <mat-icon>help_outline</mat-icon>
+          </button>
+        </div>
+      </div>
     </mat-toolbar>
 
     <!-- ── Cards + Team strip ────────────────────────────── -->
@@ -171,9 +183,10 @@
                [class.pc-revealed]="cardsRevealed"
                [class.pc-alert]="nonVoterAlert && !p.voted"
                [class.pc-me]="p.name === userName"
+               [class.pc-offline]="p.online === false"
                [class.pc-kickable]="isScrumMaster && p.name !== userName"
                (click)="isScrumMaster && p.name !== userName ? kickParticipant(p.name) : null"
-               [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' — click to remove' : (p.isSM ? p.name + ' (SM)' : p.name)">
+               [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' — click to remove' : p.name">
             <div class="pc-face">
               @if (cardsRevealed && p.voted) {
                 <span class="pc-value">{{ p.value }}</span>
@@ -191,7 +204,7 @@
             </div>
             <span class="pc-name">
               {{ p.name }}
-              @if (p.isSM) { <mat-icon class="pc-star">star</mat-icon> }
+              @if (p.online === false) {<span class="pc-offline">offline</span>}
             </span>
           </div>
         }

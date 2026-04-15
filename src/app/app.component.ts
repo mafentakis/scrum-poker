@@ -18,6 +18,7 @@ export interface Participant {
   value: string | null;
   isSM: boolean;
   avatar?: string;
+  online?: boolean;
 }
 
 interface ServerState {
@@ -107,11 +108,13 @@ export class AppComponent implements OnInit, OnDestroy {
   connected = false;
 
   // ── Alert / beep state ────────────────────────────────
-  nonVoterAlert  = false;
-  private warningBeeped  = false;
-  private destroying     = false;
+  nonVoterAlert    = false;
+  postTimerElapsed = 0;   // counts up for 10 s after timer hits 0; 0 = inactive
+  private warningBeeped    = false;
+  private destroying       = false;
   private ws: WebSocket | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private postTimerInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private snackBar: MatSnackBar,
@@ -149,6 +152,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroying = true;
     this.clearReconnect();
+    this.clearPostTimer();
     this.ws?.close();
     window.removeEventListener('resize', this.onWindowResize);
   }
@@ -223,6 +227,23 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  private startPostTimer(): void {
+    this.clearPostTimer();
+    this.postTimerElapsed = 0;
+    this.postTimerInterval = setInterval(() => {
+      this.postTimerElapsed++;
+      if (this.postTimerElapsed >= 10) this.clearPostTimer();
+    }, 1000);
+  }
+
+  private clearPostTimer(): void {
+    if (this.postTimerInterval !== null) {
+      clearInterval(this.postTimerInterval);
+      this.postTimerInterval = null;
+    }
+    this.postTimerElapsed = 0;
+  }
+
   // ── State from server ─────────────────────────────────
 
   private applyState(s: ServerState): void {
@@ -241,9 +262,10 @@ export class AppComponent implements OnInit, OnDestroy {
     const me = s.participants.find(p => p.name === this.userName);
     this.selectedCard = me?.voted ? (me.value ?? null) : null;
 
-    // Reset warning flag when timer resets to full
-    if (s.timerRemaining >= s.timerDuration - 1) {
+    // Reset warning flag when timer resets to full; also kill the post-timer overlay
+    if (s.timerRemaining >= s.timerDuration - 1 || s.timerRunning) {
       this.warningBeeped = false;
+      this.clearPostTimer();
     }
 
     // Beep at 10 s warning
@@ -260,6 +282,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private onTimerEnd(): void {
+    this.startPostTimer();
     const missing = this.participants.filter(p => !p.voted && !p.isSM).map(p => p.name);
     const iAmMissing = missing.includes(this.userName);
 
