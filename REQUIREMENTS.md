@@ -103,10 +103,10 @@ Role is self-selected at registration (no authentication required).
 
 | Count | Badge | Meaning |
 |---|---|---|
-| 1 | ⏰1 | Late once |
-| 2 | 🐢2 | Slow |
-| 3–4 | 😴3 | Checked out |
-| 5+ | 💀5 | Hopeless |
+| 1 | ⏰ | Late once |
+| 2 | 🐢 | Slow |
+| 3–4 | 😴 | Checked out |
+| 5+ | 💀 | Hopeless |
 
 - Hovering the badge shows a tooltip: "Missed N deadline(s)".
 
@@ -123,33 +123,19 @@ Role is self-selected at registration (no authentication required).
 
 ## Layout & Sizing
 
-### Compact mode (default)
+### Layout (single fixed mode)
 ```
 ┌───────────────────────────────────────────────────────────────┐
 │  Progress bar  (4 px)                                         │
 ├───────────────────────────────────────────────────────────────┤
-│  Toolbar (36 px)  —  Logo | Room | Timer controls | User | ⤢  │
+│  Toolbar (36 px)  —  Logo | Room | Timer controls | User      │
 ├───────────────────────────────────────────────────────────────┤
-│  Cards + Team strip  (80 px)                                  │
+│  Cards + Team strip  (80 px)  — bottom-aligned                │
 └───────────────────────────────────────────────────────────────┘
 Total height: 120 px  (fixed, resize-locked in standalone PWA)
 ```
 
-### Expanded mode (⤢ button in toolbar)
-```
-┌───────────────────────────────────────────────────────────────┐
-│  Progress bar  (4 px)                                         │
-├───────────────────────────────────────────────────────────────┤
-│  Toolbar (36 px)                                              │
-├───────────────────────────────────────────────────────────────┤
-│  Cards + Team strip  (80 px)                                  │
-├───────────────────────────────────────────────────────────────┤
-│  Jira URL input — SM only  (44 px)                            │
-├───────────────────────────────────────────────────────────────┤
-│  Jira issue link                                              │
-└───────────────────────────────────────────────────────────────┘
-Total height: 100 vh
-```
+> Note: expand/collapse mode was removed. The Jira URL input and link are always visible below the strip when the window is taller.
 
 ---
 
@@ -185,8 +171,10 @@ Total height: 100 vh
 | C → S | `setDuration` | `room, value` |
 | C → S | `setJiraUrl` | `room, url` |
 | C → S | `leave` | `room` |
+| C → S | `kick` | `room, target` |
 | S → C | `state` | full `RoomState` snapshot |
 | S → C | `timerEnd` | full `RoomState` snapshot |
+| S → C | `kicked` | _(no payload — sent only to the removed client)_ |
 
 ---
 
@@ -276,7 +264,6 @@ Pre-fills the registration form on reload. Cleared on logout.
 ### Layout & PWA
 
 - **As a user**, the app runs in a fixed **120 px compact strip** that sits above any other window — so it stays visible while the team is in a Zoom call or Jira.
-- **As a user**, I can click the expand (⤢) button to switch to full-screen mode where the Jira section is visible.
-- **As a user**, collapsing back to compact mode snaps the window height to 120 px automatically.
+- **As a user**, I can install the app as a PWA and it runs in a fixed 120 px window — the expand/collapse toggle was removed for simplicity.
 - **As a user**, I can install the app as a PWA from Chrome's address bar — so it opens as a standalone window without browser chrome.
 - **As a user**, a coloured dot in the toolbar shows my WebSocket connection status (green = connected, red = reconnecting) — so I know if I'm live with the room.
