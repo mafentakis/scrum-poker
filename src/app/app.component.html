@@ -126,7 +126,14 @@
       @if (isScrumMaster) {
         <span class="sm-badge"><mat-icon>star</mat-icon>SM</span>
       }
-      <span class="user-chip"><mat-icon>account_circle</mat-icon>{{ userName }}</span>
+      <span class="user-chip">
+        @if (registerAvatar) {
+          <img class="user-avatar" [src]="registerAvatar" alt="">
+        } @else {
+          <mat-icon>account_circle</mat-icon>
+        }
+        {{ userName }}
+      </span>
       <span class="conn-dot" [class.conn-on]="connected" [matTooltip]="connected ? 'Connected' : 'Reconnecting…'"></span>
       <button mat-icon-button (click)="logout()" matTooltip="Leave session">
         <mat-icon>logout</mat-icon>
