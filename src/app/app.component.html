@@ -68,35 +68,41 @@
       <span class="toolbar-spacer"></span>
 
       <!-- Timer: time + SM controls or participant hint -->
-      <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
-
       @if (isScrumMaster) {
-        <button mat-stroked-button class="bar-btn"
-                (click)="startTimer()" [disabled]="timerRunning || timerRemaining === 0"
-                matTooltip="Start timer">
-          <mat-icon>play_arrow</mat-icon>
-        </button>
-        <button mat-stroked-button class="bar-btn"
-                (click)="pauseTimer()" [disabled]="!timerRunning"
-                matTooltip="Pause timer">
-          <mat-icon>pause</mat-icon>
-        </button>
-        <button mat-stroked-button class="bar-btn"
-                (click)="resetTimer()"
-                matTooltip="Reset timer">
-          <mat-icon>replay</mat-icon>
-        </button>
+        <div class="timer-widget">
+          <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
 
-        <span class="duration-wrap">
-          <mat-select [(ngModel)]="timerDuration"
-                      (ngModelChange)="onDurationChange($event)"
-                      class="duration-select"
-                      panelClass="duration-panel">
-            @for (opt of TIMER_OPTIONS; track opt.value) {
-              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          <!-- Single toggle button -->
+          <button mat-stroked-button class="bar-btn timer-toggle"
+                  (click)="timerRunning ? pauseTimer() : startTimer()"
+                  [disabled]="!timerRunning && timerRemaining === 0">
+            @if (timerRunning) {
+              <mat-icon>pause</mat-icon><span class="btn-label">Pause</span>
+            } @else if (timerRemaining < timerDuration) {
+              <mat-icon>play_arrow</mat-icon><span class="btn-label">Resume</span>
+            } @else {
+              <mat-icon>play_arrow</mat-icon><span class="btn-label">Start</span>
             }
-          </mat-select>
-        </span>
+          </button>
+
+          <!-- Reset — only when timer has been touched -->
+          @if (timerRemaining < timerDuration) {
+            <button mat-icon-button class="bar-btn timer-reset"
+                    (click)="resetTimer()" matTooltip="Reset timer">
+              <mat-icon>replay</mat-icon>
+            </button>
+          }
+
+          <!-- Duration chips -->
+          <div class="duration-chips">
+            @for (opt of TIMER_OPTIONS; track opt.value) {
+              <button class="dur-chip"
+                      [class.dur-chip-active]="timerDuration === opt.value"
+                      [disabled]="timerRunning"
+                      (click)="onDurationChange(opt.value)">{{ opt.label }}</button>
+            }
+          </div>
+        </div>
 
         <span class="toolbar-sep"></span>
 
@@ -112,6 +118,7 @@
 
         <span class="toolbar-sep"></span>
       } @else {
+        <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
         <span class="tb-divider"></span>
         <span class="voted-hint">
           @if (!cardsRevealed) {
