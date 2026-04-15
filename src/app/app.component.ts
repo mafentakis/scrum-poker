@@ -163,6 +163,18 @@ export class AppComponent implements OnInit, OnDestroy {
         const msg = JSON.parse(data);
         if (msg.type === 'state')    this.applyState(msg.data);
         if (msg.type === 'timerEnd') { this.applyState(msg.data); this.onTimerEnd(); }
+        if (msg.type === 'kicked') {
+          // Server already removed us — just clear local state without sending 'leave'
+          localStorage.removeItem('scrumPokerUser');
+          this.isRegistered  = false;
+          this.userName      = '';
+          this.roomName      = '';
+          this.isScrumMaster = false;
+          this.registerAsSM  = false;
+          this.selectedCard  = null;
+          this.snackBar.open('You have been removed from the session.', 'OK',
+            { duration: 6000, panelClass: 'snack-warn' });
+        }
         if (msg.type === 'error' && msg.code === 'NAME_TAKEN') {
           this.isRegistered  = false;
           this.registerError = `"${msg.name}" is already in this room. Choose a different name.`;

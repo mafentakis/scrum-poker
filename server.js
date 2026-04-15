@@ -270,6 +270,24 @@ wss.on('connection', (ws) => {
         const room = rooms.get(roomName);
         const target = String(msg.target ?? '').trim();
         if (!room || !target || target === ws.participantName) break;
+
+        // Tell the kicked client to log out immediately
+        const targetWs = [...wss.clients].find(
+          c => c.readyState === 1 && c.roomName === roomName && c.participantName === target
+        );
+        if (targetWs) {
+          targetWs.send(JSON.stringify({ type: 'kicked' }));
+          targetWs.participantName = null;
+          targetWs.roomName = null;
+        }
+
+        // Cancel any pending disconnect timer so they don't get re-added
+        const kickKey = `${roomName}:${target}`;
+        if (disconnectTimers.has(kickKey)) {
+          clearTimeout(disconnectTimers.get(kickKey));
+          disconnectTimers.delete(kickKey);
+        }
+
         room.participants = room.participants.filter(p => p.name !== target);
         room.lastActivity = Date.now();
         console.log(`[${roomName}] "${ws.participantName}" kicked "${target}"`);
