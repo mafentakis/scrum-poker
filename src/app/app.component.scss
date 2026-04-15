@@ -449,17 +449,10 @@
 
 .miss-badge {
   position: absolute;
-  bottom: 13px;   // sits at bottom edge of .pc-face, above .pc-name
+  bottom: 13px;
   right: -7px;
-  font-size: 0.6rem;
-  font-weight: 600;
-  background: #fff3e0;
-  color: #e65100;
-  border: 1px solid #ffcc80;
-  border-radius: 8px;
-  padding: 0 4px;
-  line-height: 14px;
-  white-space: nowrap;
+  font-size: 0.75rem;
+  line-height: 1;
   cursor: default;
   z-index: 1;
 }
