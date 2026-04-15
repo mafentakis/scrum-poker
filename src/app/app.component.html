@@ -66,10 +66,6 @@
       </span>
 
       <span class="toolbar-spacer"></span>
-      <button mat-icon-button class="share-btn" (click)="shareRoom()" matTooltip="Copy invite link">
-        <mat-icon>share</mat-icon>
-      </button>
-      <span class="toolbar-spacer"></span>
 
       <!-- Timer: time + SM controls or participant hint -->
       <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
@@ -141,6 +137,9 @@
       <span class="conn-dot" [class.conn-on]="connected" [matTooltip]="connected ? 'Connected' : 'Reconnecting…'"></span>
       <button mat-icon-button (click)="logout()" matTooltip="Leave session">
         <mat-icon>logout</mat-icon>
+      </button>
+      <button mat-icon-button class="share-btn" (click)="shareRoom()" matTooltip="Copy invite link">
+        <mat-icon>share</mat-icon>
       </button>
       <button mat-icon-button matTooltip="Help"
               (click)="openHelp()">
