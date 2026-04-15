@@ -255,10 +255,12 @@ Pre-fills the registration form on reload. Cleared on logout.
 - **As any participant**, I can see which team member is the Scrum Master via a ★ badge on their chip.
 - **As any participant**, I can see the running vote tally (`N / M voted`) in the toolbar before reveal.
 - **As any participant**, after reveal I see the average score (numeric votes only) both in the toolbar and as a chip in the team strip.
+- **As a participant**, my own card is visually distinguished — purple border, glow, and bold name — so I can immediately spot myself in a busy team strip.
 
 ### Miss Score (Deadline Tracker)
 
 - **As any participant**, I can see a playful emoji badge on each team member's chip showing how many timer deadlines they have missed this session — ⏰ (1), 🐢 (2), 😴 (3–4), 💀 (5+) — so the team has a lighthearted way to track responsiveness.
+- **As the SM**, I am never given a miss badge or timeout alert — I control the timer and am not expected to vote.
 - **As any participant**, hovering a miss badge shows a tooltip "Missed N deadline(s)".
 - **As any participant**, miss counts survive new rounds and only reset on server restart.
 
