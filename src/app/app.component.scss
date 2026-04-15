@@ -213,14 +213,8 @@
   .toolbar-right {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 0;
     flex-shrink: 0;
-  }
-
-  .tb-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .tb-divider {
@@ -252,18 +246,6 @@
     }
   }
 
-  // Ghost secondary actions — smaller and quieter
-  .share-btn,
-  button[matTooltip="Leave session"],
-  button[matTooltip="Help"] {
-    width: 28px !important;
-    height: 28px !important;
-    line-height: 28px !important;
-    color: rgba(0,0,0,0.28) !important;
-    transition: color 0.15s;
-    &:hover { color: rgba(0,0,0,0.75) !important; }
-    mat-icon { font-size: 16px !important; height: 16px !important; width: 16px !important; }
-  }
 
 .conn-dot {
     width: 7px; height: 7px;
@@ -339,29 +321,31 @@
   height: 26px;
 }
 
-.bar-btn {
-  height: 22px;
-  line-height: 22px;
-  min-width: unset;
-  padding: 0 6px;
-  margin: 0;
-  mat-icon { font-size: 15px; height: 15px; width: 15px; }
-}
+// ── Icon button — plain button, no MDC ───────────────
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  color: #757575;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
 
-.timer-toggle {
-  color: #616161 !important;
-  opacity: 0.8;
-  &:hover:not([disabled]) { opacity: 1; color: #212121 !important; }
-  &[disabled] { opacity: 0.3; }
-}
+  mat-icon { font-size: 16px; height: 16px; width: 16px; line-height: 16px; }
 
-.timer-reset {
-  width: 22px;
-  height: 22px;
-  line-height: 22px;
-  color: #9e9e9e !important;
-  &:hover { color: #424242 !important; }
-  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  &:hover:not([disabled]) {
+    background: rgba(0, 0, 0, 0.08);
+    color: #212121;
+  }
+
+  &[disabled] { opacity: 0.35; cursor: default; }
+  &:focus-visible { outline: 2px solid #374151; outline-offset: 1px; }
 }
 
 .duration-chips {
@@ -397,11 +381,6 @@
   }
 }
 
-.reveal-btn {
-  color: #616161 !important;
-  opacity: 0.8;
-  &:hover { opacity: 1; color: #212121 !important; }
-}
 
 // ═══════════════════════════════════════════════════════
 // COMPACT STRIP: mini cards + team
