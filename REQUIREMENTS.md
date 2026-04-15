@@ -1,7 +1,7 @@
 # Scrum Poker — Requirements
 
 ## Overview
-A browser-based Scrum Poker (Planning Poker) tool for agile teams. The Scrum Master drives estimation sessions; developers vote on story points. A Jira issue is embedded below the poker UI so the team can read the ticket while estimating. Multiple teams run isolated sessions in separate **rooms**.
+A browser-based Scrum Poker (Planning Poker) tool for agile teams. The Scrum Master drives estimation sessions; developers vote on story points. A Jira issue link is shown below the poker UI so the team can open the ticket while estimating. Multiple teams run isolated sessions in separate **rooms**.
 
 ---
 
@@ -18,12 +18,12 @@ Role is self-selected at registration (no authentication required).
 
 ## Registration
 
-- On first visit (or after logout) a full-screen registration card is shown.
+- On first visit (or after logout) a **compact bar** (same 120 px height as the app) is shown.
 - User enters:
-  - **Room name** — identifies the session (e.g. "Team Alpha Sprint 42")
+  - **Room** — identifies the session (e.g. "Team Alpha Sprint 42")
   - **Your name** — display name within the room
-  - **"I am the Scrum Master"** checkbox
-- **Join Session** button is disabled until both fields are filled.
+  - **"as scrum master"** checkbox
+- **Join** button is disabled until both fields are filled. Submits on Enter key.
 - All three values are persisted in `localStorage` and **pre-filled** on the next page load so the user can rejoin with one click.
 - A **Leave session** button (toolbar) logs the user out; the participant is immediately removed from the room on the server.
 
@@ -67,7 +67,7 @@ Role is self-selected at registration (no authentication required).
   - **Orange** — ≤ 30 s remaining
   - **Red + pulse** — ≤ 10 s remaining
 - **Configurable duration** (SM only): 30 s / 1 min / 1:30 / 2 min / 3 min / 5 min.
-- SM controls inline in the timer bar: **▶ Start / ⏸ Pause / 🔄 Reset**, duration selector, **Reveal Cards** button.
+- SM controls inline in the toolbar: **▶ Start / ⏸ Pause / 🔄 Reset**, duration selector, **Reveal Cards** button.
 - **Timer runs server-side** — all participants in the room see the same countdown; one `setInterval` on the server broadcasts every second.
 
 ### Timeout behaviour
@@ -93,33 +93,51 @@ Role is self-selected at registration (no authentication required).
 
 ## Jira Integration
 
-- SM enters a Jira issue URL in a compact input bar; it is broadcast to **all participants** in the room via WebSocket.
-- Issue loads in an **`<iframe>`** filling all remaining viewport height.
-- **Warning banner** shown after iframe loads: most Jira Cloud instances send `X-Frame-Options: DENY` and will render blank — the banner explains this and offers "Open in new tab".
-- **"Open in new tab"** fallback link always available when a URL is loaded.
-- SM can clear the URL (removes iframe for all participants).
+- SM enters a Jira issue URL in a compact input bar (visible in expanded mode); it is broadcast to **all participants** in the room via WebSocket.
+- Issue is shown as a **plain link** (opens in a new tab) — no iframe embedding.
+  - Iframe approach was abandoned: Atlassian Cloud sends `X-Frame-Options: DENY`, causing a blank frame.
+- SM can clear the URL (removes the link for all participants).
 
 ---
 
 ## Layout & Sizing
 
+### Compact mode (default)
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│  Toolbar (48 px)  —  Logo | Room name | SM badge | User | ●   │
+│  Progress bar  (4 px)                                         │
 ├───────────────────────────────────────────────────────────────┤
-│  Timer bar  (36 px)  —  MM:SS  ▶ ⏸ 🔄  Duration  [Reveal]    │
+│  Toolbar (36 px)  —  Logo | Room | Timer controls | User | ⤢  │
 ├───────────────────────────────────────────────────────────────┤
-│  Cards + Team strip  (≈ 80 px)                                │
+│  Cards + Team strip  (80 px)                                  │
+└───────────────────────────────────────────────────────────────┘
+Total height: 120 px  (fixed, resize-locked in standalone PWA)
+```
+
+### Expanded mode (⤢ button in toolbar)
+```
+┌───────────────────────────────────────────────────────────────┐
+│  Progress bar  (4 px)                                         │
+├───────────────────────────────────────────────────────────────┤
+│  Toolbar (36 px)                                              │
+├───────────────────────────────────────────────────────────────┤
+│  Cards + Team strip  (80 px)                                  │
 ├───────────────────────────────────────────────────────────────┤
 │  Jira URL input — SM only  (44 px)                            │
 ├───────────────────────────────────────────────────────────────┤
-│                                                               │
-│  Jira iframe  — fills all remaining viewport height           │
-│                                                               │
+│  Jira issue link                                              │
 └───────────────────────────────────────────────────────────────┘
+Total height: 100 vh
 ```
 
-Total chrome: **≈ 208 px**. Iframe gets 100% of the rest.
+---
+
+## PWA
+
+- `manifest.webmanifest` with `display: standalone`, `theme_color: #5c35b5`.
+- Icons at `assets/icon-192.svg` and `assets/icon-512.svg`.
+- Installable via Chrome's address bar install button.
+- In standalone mode `window.resizeTo()` locks the window to 120 px in compact mode.
 
 ---
 

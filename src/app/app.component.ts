@@ -1,7 +1,6 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -70,10 +69,19 @@ export class AppComponent implements OnInit, OnDestroy {
   timerRunning    = false;
   selectedCard:   string | null = null;
 
+  // ── Layout ────────────────────────────────────────────
+  private readonly COMPACT_H = 120;
+  private _isExpanded = false;
+
+  get isExpanded(): boolean { return this._isExpanded; }
+  set isExpanded(v: boolean) {
+    this._isExpanded = v;
+    if (!v) this.snapCompact();
+  }
+
   // ── Jira ──────────────────────────────────────────────
-  jiraUrl      = '';
-  safeJiraUrl: SafeResourceUrl | null = null;
-  jiraLoaded   = false;
+  jiraUrl    = '';
+  jiraLoaded = false;
 
   // ── Connection ────────────────────────────────────────
   connected = false;
@@ -86,14 +94,16 @@ export class AppComponent implements OnInit, OnDestroy {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
-    private snackBar:  MatSnackBar,
-    private sanitizer: DomSanitizer,
-    private zone:      NgZone,
+    private snackBar: MatSnackBar,
+    private zone:     NgZone,
   ) {}
 
   // ── Lifecycle ─────────────────────────────────────────
 
   ngOnInit(): void {
+    window.addEventListener('resize', this.onWindowResize);
+    this.snapCompact();
+
     const saved = localStorage.getItem('scrumPokerUser');
     if (saved) {
       try {
@@ -115,6 +125,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.destroying = true;
     this.clearReconnect();
     this.ws?.close();
+    window.removeEventListener('resize', this.onWindowResize);
   }
 
   // ── WebSocket ─────────────────────────────────────────
@@ -195,14 +206,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Jira URL sync — all clients follow what SM sets
     if (s.jiraUrl !== this.jiraUrl || (s.jiraUrl && !this.jiraLoaded)) {
-      this.jiraUrl = s.jiraUrl;
-      if (s.jiraUrl) {
-        this.safeJiraUrl = this.sanitizer.bypassSecurityTrustResourceUrl(s.jiraUrl);
-        this.jiraLoaded  = true;
-      } else {
-        this.safeJiraUrl = null;
-        this.jiraLoaded  = false;
-      }
+      this.jiraUrl    = s.jiraUrl;
+      this.jiraLoaded = !!s.jiraUrl;
     }
   }
 
@@ -327,4 +332,14 @@ export class AppComponent implements OnInit, OnDestroy {
       osc.start(); osc.stop(ctx.currentTime + duration);
     } catch { /* audio blocked */ }
   }
+
+  // ── Window sizing (PWA standalone) ───────────────────
+
+  private snapCompact(): void {
+    window.resizeTo(window.outerWidth, this.COMPACT_H + (window.outerHeight - window.innerHeight));
+  }
+
+  private readonly onWindowResize = (): void => {
+    if (!this._isExpanded) this.snapCompact();
+  };
 }

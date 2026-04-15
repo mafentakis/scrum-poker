@@ -1,33 +1,86 @@
 // ═══════════════════════════════════════════════════════
-// REGISTRATION
+// REGISTRATION — compact bar, same 120px as app shell
 // ═══════════════════════════════════════════════════════
 
-.register-backdrop {
-  min-height: 100vh;
+.register-bar {
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: white;
+}
+
+.reg-toolbar {
+  flex-shrink: 0;
+  height: 36px;
+  background: #616161;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 6px;
+
+  .toolbar-logo { font-size: 16px; height: 16px; width: 16px; }
+  .toolbar-brand { font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px; }
+}
+
+.reg-inputs {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #3949ab 0%, #7b1fa2 100%);
+  gap: 8px;
+  padding: 0 12px;
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.register-card {
-  width: 400px;
-  padding: 8px 16px 16px;
+.reg-input {
+  height: 32px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  background: white;
+  color: #333;
+  width: 160px;
 
-  .register-logo {
-    display: flex;
-    justify-content: center;
-    margin: 16px 0 8px;
-    .logo-icon { font-size: 52px; height: 52px; width: 52px; color: #5c35b5; }
-  }
+  &::placeholder { color: #bdbdbd; }
+  &:focus { border-color: #5c35b5; }
+}
 
-  mat-card-header { justify-content: center; text-align: center; }
+.reg-sm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #555;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
 
-  mat-card-content { margin-top: 20px; }
+  input[type=checkbox] { accent-color: #5c35b5; cursor: pointer; }
+}
 
-  .full-width { width: 100%; }
+.reg-join {
+  height: 32px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 4px;
+  background: #5c35b5;
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
 
-  .sm-checkbox { display: block; margin-top: 4px; }
+  &:hover:not(:disabled) { background: #4527a0; }
+  &:disabled { background: #bdbdbd; cursor: default; }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -37,8 +90,20 @@
 .app-shell {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 120px;
   overflow: hidden;
+
+  &.expanded {
+    height: 100vh;
+  }
+}
+
+.top-layout {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: white;
 }
 
 // ── Progress strip (top of page) ─────────────────────────
@@ -409,6 +474,10 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+
+  .app-shell:not(.expanded) & {
+    display: none;
+  }
   gap: 8px;
   padding: 6px 12px;
   background: white;
@@ -429,45 +498,40 @@
     &::placeholder { color: #bdbdbd; }
   }
 
-  .jira-open-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    color: #1565c0;
-    font-size: 0.78rem;
-    text-decoration: none;
-    white-space: nowrap;
-    &:hover { text-decoration: underline; }
-    mat-icon { font-size: 14px; height: 14px; width: 14px; }
-  }
 }
 
 .jira-area {
   flex: 1;
-  min-height: 0;
+  padding: 12px 16px;
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  align-items: flex-start;
+  overflow: auto;
+
+  .app-shell:not(.expanded) & {
+    display: none;
+  }
 }
 
-.jira-frame {
-  flex: 1;
-  width: 100%;
-  border: none;
-  display: block;
-}
+.jira-issue-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1565c0;
+  font-size: 0.9rem;
+  text-decoration: none;
+  word-break: break-all;
 
+  mat-icon { font-size: 18px; height: 18px; width: 18px; flex-shrink: 0; }
+  &:hover { text-decoration: underline; }
+}
 
 .jira-placeholder {
-  flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 10px;
   color: #bdbdbd;
 
-  mat-icon { font-size: 48px; height: 48px; width: 48px; }
+  mat-icon { font-size: 24px; height: 24px; width: 24px; }
   span { font-size: 0.9rem; }
 }
 

@@ -2,37 +2,26 @@
      REGISTRATION
      ═══════════════════════════════════════════════════════ -->
 @if (!isRegistered) {
-  <div class="register-backdrop">
-    <mat-card class="register-card" appearance="raised">
-      <div class="register-logo"><mat-icon class="logo-icon">style</mat-icon></div>
-      <mat-card-header>
-        <mat-card-title>Scrum Poker</mat-card-title>
-        <mat-card-subtitle>Enter your name to join the session</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Room name</mat-label>
-          <input matInput [(ngModel)]="registerRoom" (keyup.enter)="register()"
-                 placeholder="e.g. Team Alpha Sprint 42" autocomplete="off">
-          <mat-icon matSuffix>meeting_room</mat-icon>
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Your name</mat-label>
-          <input matInput [(ngModel)]="registerName" (keyup.enter)="register()"
-                 placeholder="e.g. Jane Doe" autocomplete="off">
-          <mat-icon matSuffix>person</mat-icon>
-        </mat-form-field>
-        <mat-checkbox [(ngModel)]="registerAsSM" color="primary" class="sm-checkbox">
-          I am the Scrum Master
-        </mat-checkbox>
-      </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-raised-button color="primary" (click)="register()"
-                [disabled]="!registerName.trim() || !registerRoom.trim()">
-          <mat-icon>login</mat-icon> Join Session
-        </button>
-      </mat-card-actions>
-    </mat-card>
+  <div class="register-bar">
+    <!-- top row: brand -->
+    <div class="reg-toolbar">
+      <mat-icon class="toolbar-logo">style</mat-icon>
+      <span class="toolbar-brand">Scrum Poker</span>
+    </div>
+    <!-- bottom row: inputs + join -->
+    <div class="reg-inputs">
+      <input class="reg-input" [(ngModel)]="registerRoom" (keyup.enter)="register()"
+             placeholder="Room" autocomplete="off">
+      <input class="reg-input" [(ngModel)]="registerName" (keyup.enter)="register()"
+             placeholder="Your name" autocomplete="off">
+      <label class="reg-sm">
+        <input type="checkbox" [(ngModel)]="registerAsSM"> as scrum master
+      </label>
+      <button class="reg-join" (click)="register()"
+              [disabled]="!registerName.trim() || !registerRoom.trim()">
+        Join
+      </button>
+    </div>
   </div>
 }
 
@@ -40,7 +29,8 @@
      MAIN APP
      ═══════════════════════════════════════════════════════ -->
 @if (isRegistered) {
-  <div class="app-shell">
+  <div class="app-shell" [class.expanded]="isExpanded">
+  <div class="top-layout">
 
     <!-- ── Thin progress strip at the very top ──────────── -->
     <div class="progress-strip" [ngClass]="'bar-' + timerClass">
@@ -121,6 +111,10 @@
       <button mat-icon-button (click)="logout()" matTooltip="Leave session">
         <mat-icon>logout</mat-icon>
       </button>
+      <button mat-icon-button (click)="isExpanded = !isExpanded"
+              [matTooltip]="isExpanded ? 'Compact' : 'Expand'">
+        <mat-icon>{{ isExpanded ? 'close_fullscreen' : 'open_in_full' }}</mat-icon>
+      </button>
     </mat-toolbar>
 
     <!-- ── Cards + Team strip ────────────────────────────── -->
@@ -177,6 +171,8 @@
 
     </div>
 
+  </div><!-- /.top-layout -->
+
     <!-- ── Jira URL input (SM only) ──────────────────────── -->
     @if (isScrumMaster) {
       <div class="jira-input-bar">
@@ -187,9 +183,6 @@
                placeholder="Jira Issue URL — e.g. https://company.atlassian.net/browse/PROJ-123" />
         <button mat-flat-button color="primary" (click)="loadJira()">Load</button>
         @if (jiraLoaded) {
-          <a [href]="jiraUrl" target="_blank" rel="noopener" class="jira-open-link" matTooltip="Page blocked by Jira? Open here">
-            <mat-icon>open_in_new</mat-icon> Can't see it?
-          </a>
           <button mat-icon-button (click)="clearJira()" matTooltip="Clear">
             <mat-icon>close</mat-icon>
           </button>
@@ -197,16 +190,18 @@
       </div>
     }
 
-    <!-- ── Jira iframe ────────────────────────────────────── -->
+    <!-- ── Jira link ─────────────────────────────────────── -->
     <div class="jira-area">
-      @if (jiraLoaded && safeJiraUrl) {
-        <iframe [src]="safeJiraUrl" class="jira-frame" frameborder="0" title="Jira Issue"></iframe>
+      @if (jiraLoaded) {
+        <a [href]="jiraUrl" target="_blank" rel="noopener" class="jira-issue-link">
+          <mat-icon>open_in_new</mat-icon>{{ jiraUrl }}
+        </a>
       } @else {
         <div class="jira-placeholder">
           <mat-icon>open_in_browser</mat-icon>
           <span>
-            @if (isScrumMaster) { Enter a Jira URL above to embed the issue here. }
-            @else { Waiting for Scrum Master to load a Jira issue… }
+            @if (isScrumMaster) { Enter a Jira URL above to share with the team. }
+            @else { Waiting for Scrum Master to share a Jira issue… }
           </span>
         </div>
       }
