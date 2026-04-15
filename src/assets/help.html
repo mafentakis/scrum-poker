@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrum Poker — Help</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #212121;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #616161;
+      color: white;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    }
+    header .logo { font-size: 22px; }
+    header h1 { font-size: 1.15rem; font-weight: 500; letter-spacing: .3px; }
+
+    nav {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+    nav a {
+      display: inline-block;
+      padding: 12px 18px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #616161;
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: color .15s, border-color .15s;
+    }
+    nav a:hover { color: #5c35b5; border-bottom-color: #5c35b5; }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    section { margin-bottom: 56px; }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #4527a0;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #ede7f6;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin: 20px 0 8px;
+    }
+
+    p { margin-bottom: 12px; color: #424242; }
+
+    figure {
+      margin: 20px 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    }
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    figcaption {
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      color: #757575;
+      background: #fafafa;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      background: #ede7f6;
+      color: #4527a0;
+      font-weight: 600;
+    }
+    td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    .badge-row { display: flex; gap: 24px; flex-wrap: wrap; margin: 12px 0; }
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+    }
+    .badge .emoji { font-size: 1.4rem; }
+    .badge .label { color: #424242; }
+    .badge .count { font-weight: 600; color: #e65100; }
+
+    .chip {
+      display: inline-block;
+      background: #ede7f6;
+      color: #4527a0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin: 0 2px;
+    }
+
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.88rem;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: #5c35b5;
+    }
+
+    ul { padding-left: 20px; color: #424242; }
+    ul li { margin-bottom: 6px; }
+
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #9e9e9e;
+      padding: 24px;
+      border-top: 1px solid #e0e0e0;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">🃏</span>
+  <h1>Scrum Poker — Help</h1>
+</header>
+
+<nav>
+  <a href="#getting-started">Getting started</a>
+  <a href="#voting">Voting</a>
+  <a href="#timer">Timer</a>
+  <a href="#reveal">Reveal &amp; rounds</a>
+  <a href="#miss">Miss tracker</a>
+  <a href="#jira">Jira</a>
+  <a href="#sm">Scrum Master</a>
+  <a href="#roles">Roles</a>
+</nav>
+
+<main>
+
+  <!-- Getting started -->
+  <section id="getting-started">
+    <h2>Getting started</h2>
+    <p>On first visit you see the registration bar. Enter a <strong>room name</strong> (any text — shared with your team), your <strong>display name</strong>, and optionally tick <em>"as scrum master"</em>. Then press <strong>Join</strong> or hit Enter.</p>
+    <figure>
+      <img src="screenshots/screenshot-login.png" alt="Login bar">
+      <figcaption>Registration bar — enter room, name, and SM role. Pre-filled from your last session.</figcaption>
+    </figure>
+    <ul>
+      <li>Your room, name and role are saved in <code>localStorage</code> and pre-filled on reload — rejoin with one click.</li>
+      <li>Room names are case-insensitive. Anyone entering the same room name joins the same session.</li>
+      <li>Two participants cannot have the same name in one room.</li>
+      <li>Only one Scrum Master is allowed per room.</li>
+    </ul>
+  </section>
+
+  <!-- Voting -->
+  <section id="voting">
+    <h2>Voting</h2>
+    <p>Click any card in the Fibonacci deck to cast your vote. You can change it at any time before the SM reveals.</p>
+    <figure>
+      <img src="screenshots/screenshot-voting.png" alt="Voting in progress">
+      <figcaption>Voting in progress — voted cards show ✓ (value hidden). The toolbar shows how many have voted.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Card state</th><th>What it means</th></tr>
+      <tr><td>? (light)</td><td>Participant has not voted yet</td></tr>
+      <tr><td>✓ (purple)</td><td>Voted — value is hidden until reveal</td></tr>
+      <tr><td>Number</td><td>Value shown after Scrum Master reveals</td></tr>
+    </table>
+    <p>After a page refresh your vote is restored from the server — a network blip won't lose your selection.</p>
+  </section>
+
+  <!-- Timer -->
+  <section id="timer">
+    <h2>Timer</h2>
+    <p>The Scrum Master controls a countdown timer visible to everyone. The full-width progress bar below the toolbar changes colour as time runs out.</p>
+    <figure>
+      <img src="screenshots/screenshot-timer.png" alt="Timer in danger state">
+      <figcaption>Timer danger state — bar turns red and pulses at ≤ 10 s. Participants who haven't voted hear a beep.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Time remaining</th><th>Bar colour</th><th>Alert</th></tr>
+      <tr><td>&gt; 30 s</td><td>🔵 Blue</td><td>—</td></tr>
+      <tr><td>≤ 30 s</td><td>🟠 Orange</td><td>—</td></tr>
+      <tr><td>≤ 10 s</td><td>🔴 Red + pulse</td><td>Beep for unvoted participants</td></tr>
+      <tr><td>0 s</td><td>—</td><td>Beep + snackbar for unvoted; miss badge recorded</td></tr>
+    </table>
+    <p>The timer runs on the server — all participants see the exact same countdown in real time.</p>
+    <p>Available durations: <code>30 s</code> · <code>1 min</code> · <code>1:30</code> · <code>2 min</code> · <code>3 min</code> · <code>5 min</code>.</p>
+  </section>
+
+  <!-- Reveal -->
+  <section id="reveal">
+    <h2>Reveal &amp; New Round</h2>
+    <p>When the SM clicks <strong>Reveal</strong>, all votes are shown simultaneously — preventing anchoring bias. The average (numeric votes only) appears as a circle chip in the team strip.</p>
+    <figure>
+      <img src="screenshots/screenshot-revealed.png" alt="Cards revealed">
+      <figcaption>Cards revealed — values shown, average calculated from numeric votes only.</figcaption>
+    </figure>
+    <p>Click <strong>New Round</strong> to clear all votes and start estimating the next story. Miss counts and the Jira URL are preserved across rounds.</p>
+  </section>
+
+  <!-- Miss tracker -->
+  <section id="miss">
+    <h2>Deadline Miss Tracker</h2>
+    <p>When the timer expires, any participant who hasn't voted gets a miss count. A playful emoji badge appears on their card — visible to everyone in the room.</p>
+    <figure>
+      <img src="screenshots/screenshot-missbadges.png" alt="Miss badges">
+      <figcaption>Miss badges shown on cards after timer expiry. Hover for the exact count.</figcaption>
+    </figure>
+    <div class="badge-row">
+      <div class="badge"><span class="emoji">⏰</span><span class="label">Missed <span class="count">1</span> deadline</span></div>
+      <div class="badge"><span class="emoji">🐢</span><span class="label">Missed <span class="count">2</span> deadlines</span></div>
+      <div class="badge"><span class="emoji">😴</span><span class="label">Missed <span class="count">3–4</span> deadlines</span></div>
+      <div class="badge"><span class="emoji">💀</span><span class="label">Missed <span class="count">5+</span> deadlines</span></div>
+    </div>
+    <p>Miss counts persist across rounds for the entire session. They only reset on server restart.</p>
+  </section>
+
+  <!-- Jira -->
+  <section id="jira">
+    <h2>Jira Integration</h2>
+    <p>The Scrum Master can paste a Jira issue URL into the input bar below the team strip. It is broadcast to all participants as a plain link that opens in a new tab.</p>
+    <ul>
+      <li>Paste the URL and click <strong>Load</strong> (or press Enter) to share it.</li>
+      <li>Click the <strong>✕</strong> button next to the input to clear the link for everyone.</li>
+      <li>Participants see the link immediately — no page reload needed.</li>
+    </ul>
+    <p><em>Note: Jira Cloud blocks embedding in iframes (<code>X-Frame-Options: DENY</code>), so the issue opens in a new tab rather than inline.</em></p>
+  </section>
+
+  <!-- Scrum Master -->
+  <section id="sm">
+    <h2>Scrum Master Controls</h2>
+    <p>The SM has extra controls in the toolbar and the team strip.</p>
+    <h3>Toolbar</h3>
+    <table>
+      <tr><th>Control</th><th>Action</th></tr>
+      <tr><td>▶ Play</td><td>Start the countdown timer</td></tr>
+      <tr><td>⏸ Pause</td><td>Pause the timer</td></tr>
+      <tr><td>🔄 Reset</td><td>Reset timer to the selected duration</td></tr>
+      <tr><td>Duration dropdown</td><td>Set timer length (30 s – 5 min)</td></tr>
+      <tr><td>Reveal / New Round</td><td>Flip between estimation and discussion phases</td></tr>
+    </table>
+    <h3>Removing a participant</h3>
+    <p>Hover over any team member's card (other than your own) — it highlights red. Click to remove them from the session after confirmation. The removed user is taken back to the login screen and must rejoin manually.</p>
+  </section>
+
+  <!-- Roles -->
+  <section id="roles">
+    <h2>Roles</h2>
+    <table>
+      <tr><th>Role</th><th>How to join</th><th>Capabilities</th></tr>
+      <tr>
+        <td><strong>Participant</strong></td>
+        <td>Leave "as scrum master" unchecked</td>
+        <td>Vote, see team strip, see timer and Jira link</td>
+      </tr>
+      <tr>
+        <td><strong>Scrum Master</strong></td>
+        <td>Check "as scrum master" — one per room</td>
+        <td>All participant actions + timer controls, reveal, new round, Jira URL, remove participants</td>
+      </tr>
+    </table>
+    <h3>Connection &amp; presence</h3>
+    <ul>
+      <li>A <strong>coloured dot</strong> next to your name shows connection status: green = connected, red = reconnecting.</li>
+      <li>If you refresh the page you reconnect automatically within seconds — your vote is preserved.</li>
+      <li>If you close the tab without logging out, you are automatically removed from the room after a <strong>30-second grace period</strong>.</li>
+      <li>Click <strong>Leave session</strong> (logout icon) to exit immediately.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>Scrum Poker · <a href="https://github.com/mafentakis/scrum-poker" target="_blank" rel="noopener">GitHub</a></footer>
+
+</body>
+</html>
