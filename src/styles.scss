@@ -1,0 +1,33 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+app-root { display: block; height: 100%; }
+
+.duration-panel {
+  min-width: 100px !important;
+
+  .mat-mdc-option {
+    font-size: 0.78rem;
+    min-height: 28px;
+    padding: 0 8px;
+  }
+
+  // shrink the selected checkmark
+  .mat-pseudo-checkbox {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  .mat-pseudo-checkbox::after {
+    width: 8px !important;
+    height: 4px !important;
+  }
+  .mat-mdc-option .mat-pseudo-checkbox-full {
+    margin-right: 6px;
+  }
+}

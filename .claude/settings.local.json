@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(node server.js)",
+      "Bash(echo \"server pid: $!\")",
+      "Bash(npx tsc:*)",
+      "Bash(pkill -f \"node server.js\")",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(xargs -I{} taskkill /PID {} /F)",
+      "Bash(findstr \":3000\")",
+      "Bash(taskkill /PID 21168 /F)",
+      "Bash(cmd //c \"taskkill /PID 21168 /F\")",
+      "Bash(findstr \":3000 \")",
+      "Bash(xargs -I{} cmd //c \"taskkill /PID {} /F\" sleep 1 cd C:/Users/Manolis/work/scrum-pocker)",
+      "Bash(cmd //c \"taskkill /PID 13948 /F\")"
+    ]
+  }
+}

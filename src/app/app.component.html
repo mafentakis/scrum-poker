@@ -1,0 +1,216 @@
+<!-- ═══════════════════════════════════════════════════════
+     REGISTRATION
+     ═══════════════════════════════════════════════════════ -->
+@if (!isRegistered) {
+  <div class="register-backdrop">
+    <mat-card class="register-card" appearance="raised">
+      <div class="register-logo"><mat-icon class="logo-icon">style</mat-icon></div>
+      <mat-card-header>
+        <mat-card-title>Scrum Poker</mat-card-title>
+        <mat-card-subtitle>Enter your name to join the session</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Room name</mat-label>
+          <input matInput [(ngModel)]="registerRoom" (keyup.enter)="register()"
+                 placeholder="e.g. Team Alpha Sprint 42" autocomplete="off">
+          <mat-icon matSuffix>meeting_room</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Your name</mat-label>
+          <input matInput [(ngModel)]="registerName" (keyup.enter)="register()"
+                 placeholder="e.g. Jane Doe" autocomplete="off">
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+        <mat-checkbox [(ngModel)]="registerAsSM" color="primary" class="sm-checkbox">
+          I am the Scrum Master
+        </mat-checkbox>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-raised-button color="primary" (click)="register()"
+                [disabled]="!registerName.trim() || !registerRoom.trim()">
+          <mat-icon>login</mat-icon> Join Session
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+     ═══════════════════════════════════════════════════════ -->
+@if (isRegistered) {
+  <div class="app-shell">
+
+    <!-- ── Thin progress strip at the very top ──────────── -->
+    <div class="progress-strip" [ngClass]="'bar-' + timerClass">
+      <div class="progress-fill" [style.width.%]="timerPercent"></div>
+    </div>
+
+    <!-- ── Toolbar (with timer controls inline) ─────────── -->
+    <mat-toolbar class="app-toolbar">
+      <mat-icon class="toolbar-logo">style</mat-icon>
+      <span class="toolbar-brand">Scrum Poker</span>
+      <span class="toolbar-room">
+        <mat-icon>meeting_room</mat-icon>{{ roomName }}
+      </span>
+
+      <span class="toolbar-spacer"></span>
+
+      <!-- Timer: time + SM controls or participant hint -->
+      <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
+
+      @if (isScrumMaster) {
+        <button mat-stroked-button class="bar-btn"
+                (click)="startTimer()" [disabled]="timerRunning || timerRemaining === 0"
+                matTooltip="Start timer">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button mat-stroked-button class="bar-btn"
+                (click)="pauseTimer()" [disabled]="!timerRunning"
+                matTooltip="Pause timer">
+          <mat-icon>pause</mat-icon>
+        </button>
+        <button mat-stroked-button class="bar-btn"
+                (click)="resetTimer()"
+                matTooltip="Reset timer">
+          <mat-icon>replay</mat-icon>
+        </button>
+
+        <span class="duration-wrap">
+          <mat-select [(ngModel)]="timerDuration"
+                      (ngModelChange)="onDurationChange($event)"
+                      class="duration-select"
+                      panelClass="duration-panel">
+            @for (opt of TIMER_OPTIONS; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+        </span>
+
+        <span class="toolbar-sep"></span>
+
+        @if (!cardsRevealed) {
+          <button mat-stroked-button class="reveal-btn" (click)="revealCards()">
+            <mat-icon>visibility</mat-icon> Reveal
+          </button>
+        } @else {
+          <button mat-stroked-button class="reveal-btn" (click)="newRound()">
+            <mat-icon>restart_alt</mat-icon> New Round
+          </button>
+        }
+
+        <span class="toolbar-sep"></span>
+      } @else {
+        <span class="tb-divider"></span>
+        <span class="voted-hint">
+          @if (!cardsRevealed) {
+            {{ votedCount }}&thinsp;/&thinsp;{{ participants.length }} voted
+          } @else {
+            avg <strong>{{ averageVote }}</strong>
+          }
+        </span>
+      }
+
+      <span class="tb-divider"></span>
+      @if (isScrumMaster) {
+        <span class="sm-badge"><mat-icon>star</mat-icon>SM</span>
+      }
+      <span class="user-chip"><mat-icon>account_circle</mat-icon>{{ userName }}</span>
+      <span class="conn-dot" [class.conn-on]="connected" [matTooltip]="connected ? 'Connected' : 'Reconnecting…'"></span>
+      <button mat-icon-button (click)="logout()" matTooltip="Leave session">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- ── Cards + Team strip ────────────────────────────── -->
+    <div class="compact-strip">
+
+      <!-- Mini poker cards -->
+      <div class="mini-cards">
+        @for (card of FIBONACCI_CARDS; track card) {
+          <div class="mini-card"
+               [class.mc-selected]="selectedCard === card"
+               [class.mc-disabled]="cardsRevealed"
+               (click)="selectCard(card)"
+               [matTooltip]="cardsRevealed ? '' : 'Vote ' + card">
+            <span class="mc-corner mc-tl">{{ card }}</span>
+            <span class="mc-val">{{ card }}</span>
+            <span class="mc-corner mc-br">{{ card }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="strip-sep"></div>
+
+      <!-- Team participants -->
+      <div class="team-chips">
+        @for (p of participants; track p.name) {
+          <div class="p-chip"
+               [class.pc-voted]="p.voted"
+               [class.pc-revealed]="cardsRevealed"
+               [class.pc-alert]="nonVoterAlert && !p.voted"
+               [matTooltip]="p.isSM ? p.name + ' (SM)' : p.name">
+            <div class="pc-face">
+              @if (cardsRevealed && p.voted) {
+                <span class="pc-value">{{ p.value }}</span>
+              } @else if (p.voted) {
+                <mat-icon class="pc-check">check</mat-icon>
+              } @else {
+                <span class="pc-unknown">?</span>
+              }
+            </div>
+            <span class="pc-name">
+              {{ p.name }}
+              @if (p.isSM) { <mat-icon class="pc-star">star</mat-icon> }
+            </span>
+          </div>
+        }
+
+        @if (cardsRevealed) {
+          <div class="avg-chip">
+            <div class="avg-value">{{ averageVote }}</div>
+            <span class="avg-label">avg</span>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- ── Jira URL input (SM only) ──────────────────────── -->
+    @if (isScrumMaster) {
+      <div class="jira-input-bar">
+        <mat-icon class="jira-icon">link</mat-icon>
+        <input class="jira-url-input"
+               [(ngModel)]="jiraUrl"
+               (keyup.enter)="loadJira()"
+               placeholder="Jira Issue URL — e.g. https://company.atlassian.net/browse/PROJ-123" />
+        <button mat-flat-button color="primary" (click)="loadJira()">Load</button>
+        @if (jiraLoaded) {
+          <a [href]="jiraUrl" target="_blank" rel="noopener" class="jira-open-link" matTooltip="Page blocked by Jira? Open here">
+            <mat-icon>open_in_new</mat-icon> Can't see it?
+          </a>
+          <button mat-icon-button (click)="clearJira()" matTooltip="Clear">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- ── Jira iframe ────────────────────────────────────── -->
+    <div class="jira-area">
+      @if (jiraLoaded && safeJiraUrl) {
+        <iframe [src]="safeJiraUrl" class="jira-frame" frameborder="0" title="Jira Issue"></iframe>
+      } @else {
+        <div class="jira-placeholder">
+          <mat-icon>open_in_browser</mat-icon>
+          <span>
+            @if (isScrumMaster) { Enter a Jira URL above to embed the issue here. }
+            @else { Waiting for Scrum Master to load a Jira issue… }
+          </span>
+        </div>
+      }
+    </div>
+
+  </div>
+}
