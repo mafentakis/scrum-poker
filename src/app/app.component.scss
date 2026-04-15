@@ -292,9 +292,9 @@
 .compact-strip {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   height: 80px;
-  padding: 0 12px;
+  padding: 0 12px 18px;
   gap: 0;
   background: #fafafa;
   border-bottom: 1px solid #e0e0e0;
@@ -315,7 +315,7 @@
 .mini-cards {
   display: flex;
   gap: 7px;
-  align-items: center;
+  align-items: flex-end;
   flex-shrink: 0;
 }
 
@@ -381,11 +381,8 @@
 }
 
 .p-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
   position: relative;
+  flex-shrink: 0;
 
   .pc-face {
     width: 38px;
@@ -405,6 +402,11 @@
   }
 
   .pc-name {
+    position: absolute;
+    top: 100%;
+    margin-top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 0.68rem;
     color: #757575;
     max-width: 48px;
@@ -460,10 +462,8 @@
 // ── Average chip ──────────────────────────────────────
 
 .avg-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
+  position: relative;
+  flex-shrink: 0;
   margin-left: 4px;
 
   .avg-value {
@@ -481,11 +481,17 @@
   }
 
   .avg-label {
+    position: absolute;
+    top: 100%;
+    margin-top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 0.65rem;
     color: #66bb6a;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
   }
 }
 
