@@ -86,7 +86,7 @@ function startTimer(room, roomName) {
       room.timerInterval = null;
       // Tally missed deadlines for non-voters
       room.participants.forEach(p => {
-        if (!p.voted) {
+        if (!p.voted && !p.isSM) {
           room.missCount[p.name] = (room.missCount[p.name] ?? 0) + 1;
         }
       });

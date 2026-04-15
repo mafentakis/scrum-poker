@@ -74,9 +74,10 @@ Role is self-selected at registration (no authentication required).
 - **Timer runs server-side** — all participants in the room see the same countdown; one `setInterval` on the server broadcasts every second.
 
 ### Timeout behaviour
-- At **10 s** remaining: short warning beep (client-side Web Audio API) — **only for participants who have not yet voted**.
-- At **0 s**: alert beep + snackbar "Time's up — please cast your vote!" — **only shown to participants who have not yet voted**.
+- At **10 s** remaining: short warning beep (client-side Web Audio API) — **only for non-SM participants who have not yet voted**.
+- At **0 s**: alert beep + snackbar "Time's up — please cast your vote!" — **only shown to non-SM participants who have not yet voted**.
 - Non-voted participant cards receive a **pulsing red border** (visible to all participants for team awareness).
+- The **Scrum Master is excluded** from both timeout alerts and miss count tracking — they control the session and are not expected to vote.
 
 ---
 
@@ -96,7 +97,7 @@ Role is self-selected at registration (no authentication required).
 
 ## Miss Score (Deadline Tracker)
 
-- When the countdown timer reaches 0, any participant who has **not yet voted** has their miss count incremented by 1.
+- When the countdown timer reaches 0, any **non-SM participant** who has **not yet voted** has their miss count incremented by 1. The Scrum Master is never penalised.
 - The miss count persists for the **entire session** (survives new rounds; resets only on server restart).
 - **Visible to all participants** — everyone in the room sees the badges.
 - Each participant chip shows a small playful badge below their name when they have ≥ 1 miss:

@@ -234,7 +234,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // Beep at 10 s warning
-    if (s.timerRemaining === 10 && prevRemaining > 10 && !this.warningBeeped) {
+    if (s.timerRemaining === 10 && prevRemaining > 10 && !this.warningBeeped && !this.isScrumMaster) {
       this.warningBeeped = true;
       this.beep(660, 0.18, 0.2);
     }
@@ -247,11 +247,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private onTimerEnd(): void {
-    const missing = this.participants.filter(p => !p.voted).map(p => p.name);
+    const missing = this.participants.filter(p => !p.voted && !p.isSM).map(p => p.name);
     const iAmMissing = missing.includes(this.userName);
 
-    // Beep + snackbar only for participants who haven't voted yet
-    if (iAmMissing) {
+    // Beep + snackbar only for non-SM participants who haven't voted yet
+    if (iAmMissing && !this.isScrumMaster) {
       this.beep(440, 0.7, 0.3);
       this.snackBar.open(`Time's up — please cast your vote!`, 'OK',
         { duration: 6000, panelClass: 'snack-warn' });
