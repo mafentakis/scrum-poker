@@ -177,12 +177,11 @@
             <div class="pc-face">
               @if (cardsRevealed && p.voted) {
                 <span class="pc-value">{{ p.value }}</span>
+              } @else if (p.avatar) {
+                <img class="pc-avatar" [src]="p.avatar" alt=""
+                     [class.pc-avatar-voted]="p.voted">
               } @else if (p.voted) {
-                @if (p.avatar) {
-                  <img class="pc-avatar" [src]="p.avatar" alt="">
-                } @else {
-                  <mat-icon class="pc-check">check</mat-icon>
-                }
+                <mat-icon class="pc-check">check</mat-icon>
               } @else {
                 <span class="pc-unknown">?</span>
               }

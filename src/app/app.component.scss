@@ -477,6 +477,12 @@
       object-fit: cover;
       border-radius: 4px;
       display: block;
+      opacity: 0.45;          // unvoted — dimmed to signal "not voted yet"
+      filter: grayscale(40%);
+      &.pc-avatar-voted {
+        opacity: 1;           // voted — full color
+        filter: none;
+      }
     }
   }
 

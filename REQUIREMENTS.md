@@ -289,9 +289,10 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 ### Profile Avatar
 
 - **As a user**, I can optionally upload a profile photo at registration (camera icon button) — so my personality shows on the table.
-- **As a participant**, when I have voted but cards are not yet revealed, my avatar photo fills my card face — so teammates see who voted without knowing the value.
+- **As a participant**, my avatar always fills my card face (before reveal) — dimmed and greyscale when I haven't voted yet, full colour when I have — so teammates can tell at a glance who is ready.
+- **As a participant**, my avatar appears as a small circle in the toolbar next to my name — so I can see at a glance that it is set.
 - **As a participant**, my avatar is stored in `localStorage` and automatically re-used in future sessions — so I only need to set it once.
-- **As any participant**, I see other teammates' avatars on their hidden cards — so the team strip is more personal and fun.
+- **As any participant**, I see other teammates' avatars on their cards at all times before reveal — so the team strip is more personal and fun.
 
 ### Layout & PWA
 
