@@ -164,7 +164,7 @@
               {{ p.name }}
               @if (p.isSM) { <mat-icon class="pc-star">star</mat-icon> }
             </span>
-            @if (isScrumMaster && missCount[p.name]) {
+            @if (missCount[p.name]) {
               <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">
                 {{ missEmoji(missCount[p.name]) }}{{ missCount[p.name] }}
               </span>

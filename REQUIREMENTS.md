@@ -97,8 +97,8 @@ Role is self-selected at registration (no authentication required).
 
 - When the countdown timer reaches 0, any participant who has **not yet voted** has their miss count incremented by 1.
 - The miss count persists for the **entire session** (survives new rounds; resets only on server restart).
-- **Visible to the Scrum Master only** — regular participants do not see the badges.
-- Each participant chip in the SM's view shows a small playful badge below their name when they have ≥ 1 miss:
+- **Visible to all participants** — everyone in the room sees the badges.
+- Each participant chip shows a small playful badge below their name when they have ≥ 1 miss:
 
 | Count | Badge | Meaning |
 |---|---|---|
@@ -219,3 +219,60 @@ Pre-fills the registration form on reload. Cleared on logout.
 - Voting history / round log.
 - Export results (CSV, clipboard).
 - Dark mode.
+
+---
+
+## Implemented User Stories
+
+### Registration & Identity
+
+- **As a user**, I can enter a room name and my display name, then click **Join** (or press Enter) to join a planning session — so I can participate without creating an account.
+- **As a user**, I can check "as scrum master" at registration to take the SM role for the room.
+- **As a user**, my room, name, and SM preference are pre-filled on the next page load — so I can rejoin with one click after a refresh.
+- **As a user**, if I try to join with a name already taken by an active connection, I see an inline error and the name field turns red — so I know to pick a different name.
+- **As a user**, if I try to join as Scrum Master but the room already has one, I see an inline error naming the existing SM — so I understand why I can't take that role.
+- **As a user**, I can click **Leave session** in the toolbar to log out and immediately free my name and role in the room.
+
+### Voting
+
+- **As a participant**, I can click any card in the Fibonacci row (`1 2 3 5 8 13 21 ? ☕`) to cast or change my vote — so estimation is a single click.
+- **As a participant**, my selected card is visually highlighted (lifted with an accent border) — so I always know which value I submitted.
+- **As a participant**, cards are disabled after the SM reveals — so I cannot change my vote after reveal.
+- **As a participant**, my vote is restored from the server after a page refresh — so a network blip doesn't lose my selection.
+
+### Session Control (Scrum Master)
+
+- **As the SM**, I can click **Reveal** to show everyone's votes at the same time — so no anchoring bias occurs.
+- **As the SM**, I can click **New Round** to clear all votes and start estimating the next story.
+- **As the SM**, I can enter a Jira issue URL in expanded mode and click **Load** to share the link with all participants — so the team can read the ticket while estimating.
+- **As the SM**, I can clear the shared Jira link — so the link area resets between stories.
+
+### Timer
+
+- **As the SM**, I can start, pause, and reset a countdown timer directly from the toolbar — so I can time-box estimation without a separate tool.
+- **As the SM**, I can choose the timer duration (30 s / 1 min / 1:30 / 2 min / 3 min / 5 min) from a dropdown in the toolbar.
+- **As any participant**, I see the same real-time countdown and a full-width color-coded progress bar — blue → orange (≤ 30 s) → red pulsing (≤ 10 s) — so everyone knows how much time is left.
+- **As a participant who hasn't voted**, I hear a short beep at 10 s remaining as a nudge.
+- **As a participant who hasn't voted**, I receive a beep and a "Time's up — please cast your vote!" snackbar when the timer expires.
+- **As any participant**, non-voters' chips pulse red when the timer expires — so the team can see who is holding things up.
+
+### Team Awareness
+
+- **As any participant**, I see all team members in a compact horizontal strip with live vote status: `?` (not voted), `✓` (voted, hidden), or the numeric value (after reveal).
+- **As any participant**, I can see which team member is the Scrum Master via a ★ badge on their chip.
+- **As any participant**, I can see the running vote tally (`N / M voted`) in the toolbar before reveal.
+- **As any participant**, after reveal I see the average score (numeric votes only) both in the toolbar and as a chip in the team strip.
+
+### Miss Score (Deadline Tracker)
+
+- **As any participant**, I can see a playful emoji badge on each team member's chip showing how many timer deadlines they have missed this session — ⏰ (1), 🐢 (2), 😴 (3–4), 💀 (5+) — so the team has a lighthearted way to track responsiveness.
+- **As any participant**, hovering a miss badge shows a tooltip "Missed N deadline(s)".
+- **As any participant**, miss counts survive new rounds and only reset on server restart.
+
+### Layout & PWA
+
+- **As a user**, the app runs in a fixed **120 px compact strip** that sits above any other window — so it stays visible while the team is in a Zoom call or Jira.
+- **As a user**, I can click the expand (⤢) button to switch to full-screen mode where the Jira section is visible.
+- **As a user**, collapsing back to compact mode snaps the window height to 120 px automatically.
+- **As a user**, I can install the app as a PWA from Chrome's address bar — so it opens as a standalone window without browser chrome.
+- **As a user**, a coloured dot in the toolbar shows my WebSocket connection status (green = connected, red = reconnecting) — so I know if I'm live with the room.
