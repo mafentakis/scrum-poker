@@ -124,6 +124,10 @@ export class AppComponent implements OnInit, OnDestroy {
     window.addEventListener('resize', this.onWindowResize);
     this.snapCompact();
 
+    // Pre-fill room from ?room= invite link
+    const urlRoom = new URLSearchParams(location.search).get('room');
+    if (urlRoom) this.registerRoom = urlRoom.trim().slice(0, 64);
+
     const saved = localStorage.getItem('scrumPokerUser');
     if (saved) {
       try {
@@ -309,6 +313,13 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.registerAvatar) localStorage.setItem('scrumPokerAvatar', this.registerAvatar);
     localStorage.setItem('scrumPokerUser', JSON.stringify({ name, room, isSM: this.isScrumMaster }));
     this.send({ type: 'join', room, name, isSM: this.isScrumMaster, avatar: this.registerAvatar });
+  }
+
+  shareRoom(): void {
+    const url = `${location.origin}${location.pathname}?room=${encodeURIComponent(this.roomName)}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.snackBar.open('Invite link copied to clipboard!', '', { duration: 3000 });
+    });
   }
 
   openHelp(): void {

@@ -234,6 +234,14 @@
     }
   }
 
+  .share-btn {
+    width: 24px; height: 24px; line-height: 24px;
+    color: rgba(255,255,255,0.5);
+    margin-left: -4px;
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    &:hover { color: rgba(255,255,255,0.9); }
+  }
+
   .sm-badge {
     display: inline-flex;
     align-items: center;
