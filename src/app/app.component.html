@@ -146,7 +146,9 @@
                [class.pc-voted]="p.voted"
                [class.pc-revealed]="cardsRevealed"
                [class.pc-alert]="nonVoterAlert && !p.voted"
-               [matTooltip]="p.isSM ? p.name + ' (SM)' : p.name">
+               [class.pc-kickable]="isScrumMaster && p.name !== userName"
+               (click)="isScrumMaster && p.name !== userName ? kickParticipant(p.name) : null"
+               [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' — click to remove' : (p.isSM ? p.name + ' (SM)' : p.name)">
             <div class="pc-face">
               @if (cardsRevealed && p.voted) {
                 <span class="pc-value">{{ p.value }}</span>

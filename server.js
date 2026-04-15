@@ -266,6 +266,17 @@ wss.on('connection', (ws) => {
         break;
       }
 
+      case 'kick': {
+        const room = rooms.get(roomName);
+        const target = String(msg.target ?? '').trim();
+        if (!room || !target || target === ws.participantName) break;
+        room.participants = room.participants.filter(p => p.name !== target);
+        room.lastActivity = Date.now();
+        console.log(`[${roomName}] "${ws.participantName}" kicked "${target}"`);
+        broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
+        break;
+      }
+
       case 'leave': {
         const room = rooms.get(roomName);
         if (room && ws.participantName) {

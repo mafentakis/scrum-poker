@@ -287,6 +287,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.send({ type: 'vote', value });
   }
 
+  kickParticipant(name: string): void { this.send({ type: 'kick', target: name }); }
+
   revealCards(): void { this.send({ type: 'reveal' }); }
 
   newRound(): void {

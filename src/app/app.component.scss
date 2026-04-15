@@ -437,6 +437,15 @@
     box-shadow: 0 1px 6px rgba(123,31,162,0.18);
   }
 
+  &.pc-kickable {
+    cursor: pointer;
+    &:hover .pc-face {
+      border-color: #e53935;
+      background: #ffebee;
+      .pc-unknown, .pc-value { color: #c62828; }
+    }
+  }
+
   &.pc-alert .pc-face {
     border-color: #e53935 !important;
     animation: alert-pulse 0.5s ease-in-out 6;
