@@ -201,12 +201,33 @@ Pre-fills the registration form on reload. Cleared on logout.
 
 ---
 
+## PWA Offline Capabilities (Options)
+
+Scrum Poker is inherently real-time and collaborative — full offline play is not meaningful. However, the following offline tiers can be implemented:
+
+| Tier | What it gives | Effort | Notes |
+|---|---|---|---|
+| **1 — App shell cache** | App loads instantly without a network round-trip; shows the UI even if the server is down | Low | Angular `@angular/pwa` / `ngsw-config.json`; service worker caches all static assets |
+| **2 — Offline splash** | When WS is unreachable, show a friendly "You are offline — waiting to reconnect" overlay instead of a blank screen | Low | Already partially there via `connected` flag; add overlay CSS |
+| **3 — Solo / demo mode** | Allow a single user to use the card deck locally (no server needed) — useful for demos or onboarding | Medium | Local-only state; no multi-player; triggered automatically when WS never connects |
+| **4 — Background sync** | Queue votes while offline; submit when connectivity resumes | High | Requires IndexedDB + Background Sync API; complex to reconcile with server state |
+
+**Recommended path**: implement Tier 1 (service worker + asset caching) via `@angular/pwa`, then Tier 2 (offline overlay). Tier 3/4 are complex and of limited value for a collaborative tool.
+
+### Deferred user stories
+
+- **As a user**, the app shell loads instantly on a flaky connection because static assets are served from a service-worker cache — so the UI is usable even before the WS reconnects.
+- **As a user**, when I lose internet I see a clear "offline" overlay rather than a frozen screen — so I know the app is trying to reconnect.
+
+---
+
 ## Open / Deferred
 
 - Persistent storage (database) — rooms survive server restarts.
 - Password-protected rooms.
 - Story title / issue summary editable field.
 - Voting history / round log.
+- PWA offline support (Tier 1: app-shell cache; Tier 2: offline overlay).
 - Export results (CSV, clipboard).
 - Dark mode.
 
@@ -256,6 +277,7 @@ Pre-fills the registration form on reload. Cleared on logout.
 - **As any participant**, I can see the running vote tally (`N / M voted`) in the toolbar before reveal.
 - **As any participant**, after reveal I see the average score (numeric votes only) both in the toolbar and as a chip in the team strip.
 - **As a participant**, my own card is visually distinguished — purple border, glow, and bold name — so I can immediately spot myself in a busy team strip.
+- **As any participant**, I can see next to the room name who created the session and how long ago — so the team has immediate context about the session without needing to ask.
 
 ### Miss Score (Deadline Tracker)
 

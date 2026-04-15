@@ -27,6 +27,8 @@ interface ServerState {
   timerRunning: boolean;
   jiraUrl: string;
   missCount: Record<string, number>;
+  createdBy: string;
+  createdAt: number;
 }
 
 @Component({
@@ -69,6 +71,8 @@ export class AppComponent implements OnInit, OnDestroy {
   timerRemaining  = 90;
   timerRunning    = false;
   selectedCard:   string | null = null;
+  roomCreatedBy   = '';
+  roomCreatedAt   = 0;
 
   // ── Registration error ────────────────────────────────
   registerError = '';
@@ -223,6 +227,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.timerDuration = s.timerDuration;
     this.timerRemaining = s.timerRemaining;
     this.timerRunning   = s.timerRunning;
+    this.roomCreatedBy  = s.createdBy ?? '';
+    this.roomCreatedAt  = s.createdAt ?? 0;
 
     // Restore own vote from server (survives page reload)
     const me = s.participants.find(p => p.name === this.userName);
@@ -336,6 +342,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get timerPercent(): number {
     return this.timerDuration > 0 ? (this.timerRemaining / this.timerDuration) * 100 : 0;
+  }
+
+  get roomCreatedAgo(): string {
+    if (!this.roomCreatedAt) return '';
+    const diff = Math.floor((Date.now() - this.roomCreatedAt) / 1000);
+    if (diff < 60)  return 'just now';
+    if (diff < 3600) { const m = Math.floor(diff / 60);  return `${m} min ago`; }
+    if (diff < 86400){ const h = Math.floor(diff / 3600); return `${h} hour${h > 1 ? 's' : ''} ago`; }
+    const d = Math.floor(diff / 86400); return `${d} day${d > 1 ? 's' : ''} ago`;
   }
 
   get timerClass(): 'normal' | 'warning' | 'danger' {

@@ -49,6 +49,9 @@
       <span class="toolbar-brand">Scrum Poker</span>
       <span class="toolbar-room">
         <mat-icon>meeting_room</mat-icon>{{ roomName }}
+        @if (roomCreatedBy) {
+          <span class="room-meta">created by {{ roomCreatedBy }} · {{ roomCreatedAgo }}</span>
+        }
       </span>
 
       <span class="toolbar-spacer"></span>

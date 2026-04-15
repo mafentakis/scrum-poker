@@ -26,6 +26,8 @@ function getOrCreateRoom(name) {
       timerRunning: false,
       jiraUrl: '',
       missCount: {},      // { [participantName]: number }
+      createdBy: '',
+      createdAt: Date.now(),
       timerInterval: null,
       lastActivity: Date.now(),
     });
@@ -58,6 +60,8 @@ function snapshot(room) {
     timerRunning: room.timerRunning,
     jiraUrl: room.jiraUrl,
     missCount: { ...room.missCount },
+    createdBy: room.createdBy,
+    createdAt: room.createdAt,
   };
 }
 
@@ -174,6 +178,7 @@ wss.on('connection', (ws) => {
         }
 
         const room = getOrCreateRoom(roomName);
+        if (!room.createdBy) room.createdBy = participantName; // first joiner is the creator
         const existing = room.participants.find(p => p.name === participantName);
         if (existing) {
           existing.isSM = existing.isSM || isSM; // keep SM flag if already set
