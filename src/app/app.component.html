@@ -49,11 +49,6 @@
   <div class="app-shell" [class.expanded]="isExpanded">
   <div class="top-layout">
 
-    <!-- ── Thin progress strip at the very top ──────────── -->
-    <div class="progress-strip" [ngClass]="'bar-' + timerClass">
-      <div class="progress-fill" [style.width.%]="timerPercent"></div>
-    </div>
-
     <!-- ── Toolbar (with timer controls inline) ─────────── -->
     <mat-toolbar class="app-toolbar">
       <mat-icon class="toolbar-logo" matTooltip="Scrum Poker">style</mat-icon>
