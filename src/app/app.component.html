@@ -73,16 +73,11 @@
           <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
 
           <!-- Single toggle button -->
-          <button mat-stroked-button class="bar-btn timer-toggle"
+          <button mat-icon-button class="bar-btn timer-toggle"
                   (click)="timerRunning ? pauseTimer() : startTimer()"
-                  [disabled]="!timerRunning && timerRemaining === 0">
-            @if (timerRunning) {
-              <mat-icon>pause</mat-icon><span class="btn-label">Pause</span>
-            } @else if (timerRemaining < timerDuration) {
-              <mat-icon>play_arrow</mat-icon><span class="btn-label">Resume</span>
-            } @else {
-              <mat-icon>play_arrow</mat-icon><span class="btn-label">Start</span>
-            }
+                  [disabled]="!timerRunning && timerRemaining === 0"
+                  [matTooltip]="timerRunning ? 'Pause' : timerRemaining < timerDuration ? 'Resume' : 'Start'">
+            <mat-icon>{{ timerRunning ? 'pause' : 'play_arrow' }}</mat-icon>
           </button>
 
           <!-- Reset — only when timer has been touched -->
@@ -107,12 +102,12 @@
         <span class="toolbar-sep"></span>
 
         @if (!cardsRevealed) {
-          <button mat-stroked-button class="reveal-btn" (click)="revealCards()">
-            <mat-icon>visibility</mat-icon> Reveal
+          <button mat-icon-button class="reveal-btn" (click)="revealCards()" matTooltip="Reveal cards">
+            <mat-icon>visibility</mat-icon>
           </button>
         } @else {
-          <button mat-stroked-button class="reveal-btn" (click)="newRound()">
-            <mat-icon>restart_alt</mat-icon> New Round
+          <button mat-icon-button class="reveal-btn" (click)="newRound()" matTooltip="New round">
+            <mat-icon>restart_alt</mat-icon>
           </button>
         }
 

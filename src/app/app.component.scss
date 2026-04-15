@@ -337,12 +337,10 @@
 }
 
 .timer-toggle {
-  padding: 0 8px;
-  gap: 3px;
-  display: inline-flex;
-  align-items: center;
-
-  .btn-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.2px; }
+  color: white !important;
+  opacity: 0.85;
+  &:hover:not([disabled]) { opacity: 1; }
+  &[disabled] { opacity: 0.3; }
 }
 
 .timer-reset {
@@ -390,16 +388,9 @@
 }
 
 .reveal-btn {
-  height: 22px;
-  line-height: 22px;
-  font-size: 0.72rem;
-  border-color: rgba(255,255,255,0.6) !important;
   color: white !important;
-  padding: 0 8px;
-
-  mat-icon { font-size: 13px; height: 13px; width: 13px; margin-right: 2px; vertical-align: middle; }
-
-  &:hover { background: rgba(255,255,255,0.15) !important; }
+  opacity: 0.85;
+  &:hover { opacity: 1; }
 }
 
 // ═══════════════════════════════════════════════════════
