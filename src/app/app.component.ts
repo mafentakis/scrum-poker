@@ -366,8 +366,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   selectCard(value: string): void {
     if (this.cardsRevealed) return;
-    this.selectedCard = value;          // optimistic local update
-    this.send({ type: 'vote', value });
+    if (this.selectedCard === value) {
+      this.selectedCard = null;         // optimistic deselect
+      this.send({ type: 'unvote' });
+    } else {
+      this.selectedCard = value;        // optimistic select
+      this.send({ type: 'vote', value });
+    }
   }
 
   kickParticipant(name: string): void {

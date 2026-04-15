@@ -211,6 +211,19 @@ wss.on('connection', (ws) => {
         break;
       }
 
+      case 'unvote': {
+        const room = rooms.get(roomName);
+        if (!room) break;
+        const p = room.participants.find(p => p.name === ws.participantName);
+        if (p && !room.cardsRevealed) {
+          p.voted = false;
+          p.value = null;
+          room.lastActivity = Date.now();
+          broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
+        }
+        break;
+      }
+
       case 'reveal': {
         const room = rooms.get(roomName);
         if (!room) break;

@@ -164,6 +164,7 @@ Total height: 120 px  (fixed, resize-locked in standalone PWA)
 |---|---|---|
 | C → S | `join` | `room, name, isSM` |
 | C → S | `vote` | `room, value` |
+| C → S | `unvote` | `room` |
 | C → S | `reveal` | `room` |
 | C → S | `newRound` | `room` |
 | C → S | `startTimer` | `room` |
@@ -260,6 +261,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 ### Voting
 
 - **As a participant**, I can click any card in the Fibonacci row (`1 2 3 5 8 13 21 ? ☕`) to cast or change my vote — so estimation is a single click.
+- **As a participant**, I can click my already-selected card a second time to undo my vote — my chip snaps back to `?` and the vote count drops, as if I never voted.
 - **As a participant**, my selected card is visually highlighted (lifted with an accent border) — so I always know which value I submitted.
 - **As a participant**, cards are disabled after the SM reveals — so I cannot change my vote after reveal.
 - **As a participant**, my vote is restored from the server after a page refresh — so a network blip doesn't lose my selection.
