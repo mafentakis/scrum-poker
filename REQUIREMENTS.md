@@ -24,6 +24,8 @@ Role is self-selected at registration (no authentication required).
   - **Your name** — display name within the room
   - **"as scrum master"** checkbox
 - **Join** button is disabled until both fields are filled. Submits on Enter key.
+- **Duplicate name prevention**: if another active connection already holds the same name in the room, the server rejects the join with a `NAME_TAKEN` error. The name input turns red and an inline error message is shown. The check is connection-based — a disconnected participant (e.g. page refresh) can reclaim their own name.
+- **One Scrum Master per room**: if the room already has an active SM, a second join with the SM checkbox ticked is rejected with an `SM_TAKEN` error. The inline message names the existing SM: *"&lt;name&gt; is already the Scrum Master in this room."*
 - All three values are persisted in `localStorage` and **pre-filled** on the next page load so the user can rejoin with one click.
 - A **Leave session** button (toolbar) logs the user out; the participant is immediately removed from the room on the server.
 
@@ -88,6 +90,24 @@ Role is self-selected at registration (no authentication required).
 - ★ star indicates SM role.
 - Vote count pill: `3 / 5 voted`.
 - After reveal: **Average** score circle (numeric votes only).
+
+---
+
+## Miss Score (Deadline Tracker)
+
+- When the countdown timer reaches 0, any participant who has **not yet voted** has their miss count incremented by 1.
+- The miss count persists for the **entire session** (survives new rounds; resets only on server restart).
+- **Visible to the Scrum Master only** — regular participants do not see the badges.
+- Each participant chip in the SM's view shows a small playful badge below their name when they have ≥ 1 miss:
+
+| Count | Badge | Meaning |
+|---|---|---|
+| 1 | ⏰1 | Late once |
+| 2 | 🐢2 | Slow |
+| 3–4 | 😴3 | Checked out |
+| 5+ | 💀5 | Hopeless |
+
+- Hovering the badge shows a tooltip: "Missed N deadline(s)".
 
 ---
 

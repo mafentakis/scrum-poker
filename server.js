@@ -18,6 +18,7 @@ function getOrCreateRoom(name) {
       timerRemaining: 90,
       timerRunning: false,
       jiraUrl: '',
+      missCount: {},      // { [participantName]: number }
       timerInterval: null,
       lastActivity: Date.now(),
     });
@@ -49,6 +50,7 @@ function snapshot(room) {
     timerRemaining: room.timerRemaining,
     timerRunning: room.timerRunning,
     jiraUrl: room.jiraUrl,
+    missCount: { ...room.missCount },
   };
 }
 
@@ -75,6 +77,12 @@ function startTimer(room, roomName) {
       room.timerRunning = false;
       clearInterval(room.timerInterval);
       room.timerInterval = null;
+      // Tally missed deadlines for non-voters
+      room.participants.forEach(p => {
+        if (!p.voted) {
+          room.missCount[p.name] = (room.missCount[p.name] ?? 0) + 1;
+        }
+      });
       broadcastRoom(roomName, { type: 'timerEnd', data: snapshot(room) });
     } else {
       broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
@@ -122,6 +130,30 @@ wss.on('connection', (ws) => {
         const participantName = String(msg.name ?? '').trim().slice(0, 64);
         const isSM = Boolean(msg.isSM);
         if (!participantName || !roomName) break;
+
+        // Reject if another active connection already holds this name in the room
+        const takenByOther = [...wss.clients].some(
+          c => c !== ws && c.readyState === 1 &&
+               c.roomName === roomName && c.participantName === participantName
+        );
+        if (takenByOther) {
+          ws.send(JSON.stringify({ type: 'error', code: 'NAME_TAKEN', name: participantName }));
+          break;
+        }
+
+        // Reject if room already has an active SM and this join requests SM role
+        if (isSM) {
+          const room0 = rooms.get(roomName);
+          const smClient = room0 && [...wss.clients].find(
+            c => c !== ws && c.readyState === 1 &&
+                 c.roomName === roomName &&
+                 room0.participants.find(p => p.name === c.participantName && p.isSM)
+          );
+          if (smClient) {
+            ws.send(JSON.stringify({ type: 'error', code: 'SM_TAKEN', smName: smClient.participantName }));
+            break;
+          }
+        }
 
         ws.roomName        = roomName;
         ws.participantName = participantName;

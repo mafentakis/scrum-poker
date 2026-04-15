@@ -26,6 +26,7 @@ interface ServerState {
   timerRemaining: number;
   timerRunning: boolean;
   jiraUrl: string;
+  missCount: Record<string, number>;
 }
 
 @Component({
@@ -69,6 +70,9 @@ export class AppComponent implements OnInit, OnDestroy {
   timerRunning    = false;
   selectedCard:   string | null = null;
 
+  // ── Registration error ────────────────────────────────
+  registerError = '';
+
   // ── Layout ────────────────────────────────────────────
   private readonly COMPACT_H = 120;
   private _isExpanded = false;
@@ -77,6 +81,16 @@ export class AppComponent implements OnInit, OnDestroy {
   set isExpanded(v: boolean) {
     this._isExpanded = v;
     if (!v) this.snapCompact();
+  }
+
+  // ── Miss score ────────────────────────────────────────
+  missCount: Record<string, number> = {};
+
+  missEmoji(count: number): string {
+    if (count >= 5) return '💀';
+    if (count >= 3) return '😴';
+    if (count >= 2) return '🐢';
+    return '⏰';
   }
 
   // ── Jira ──────────────────────────────────────────────
@@ -149,6 +163,14 @@ export class AppComponent implements OnInit, OnDestroy {
         const msg = JSON.parse(data);
         if (msg.type === 'state')    this.applyState(msg.data);
         if (msg.type === 'timerEnd') { this.applyState(msg.data); this.onTimerEnd(); }
+        if (msg.type === 'error' && msg.code === 'NAME_TAKEN') {
+          this.isRegistered  = false;
+          this.registerError = `"${msg.name}" is already in this room. Choose a different name.`;
+        }
+        if (msg.type === 'error' && msg.code === 'SM_TAKEN') {
+          this.isRegistered  = false;
+          this.registerError = `${msg.smName} is already the Scrum Master in this room.`;
+        }
       });
     };
 
@@ -185,6 +207,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.participants  = s.participants;
     this.cardsRevealed = s.cardsRevealed;
+    this.missCount     = s.missCount ?? {};
     this.timerDuration = s.timerDuration;
     this.timerRemaining = s.timerRemaining;
     this.timerRunning   = s.timerRunning;
@@ -235,6 +258,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const name = this.registerName.trim();
     const room = this.registerRoom.trim();
     if (!name || !room) return;
+    this.registerError = '';
     this.userName      = name;
     this.roomName      = room;
     this.isScrumMaster = this.registerAsSM;

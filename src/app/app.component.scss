@@ -64,6 +64,16 @@
   input[type=checkbox] { accent-color: #5c35b5; cursor: pointer; }
 }
 
+.reg-input-error {
+  border-color: #e53935 !important;
+}
+
+.reg-error {
+  font-size: 0.75rem;
+  color: #e53935;
+  white-space: nowrap;
+}
+
 .reg-join {
   height: 32px;
   padding: 0 14px;
@@ -432,6 +442,21 @@
 @keyframes alert-pulse {
   0%, 100% { transform: scale(1);    box-shadow: none; }
   50%       { transform: scale(1.12); box-shadow: 0 0 0 3px rgba(229,57,53,0.4); }
+}
+
+// ── Miss badge ───────────────────────────────────────
+
+.miss-badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffcc80;
+  border-radius: 8px;
+  padding: 0 4px;
+  line-height: 14px;
+  white-space: nowrap;
+  cursor: default;
 }
 
 // ── Average chip ──────────────────────────────────────

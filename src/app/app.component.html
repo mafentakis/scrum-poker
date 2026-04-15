@@ -11,9 +11,12 @@
     <!-- bottom row: inputs + join -->
     <div class="reg-inputs">
       <input class="reg-input" [(ngModel)]="registerRoom" (keyup.enter)="register()"
+             (ngModelChange)="registerError=''"
              placeholder="Room" autocomplete="off">
       <input class="reg-input" [(ngModel)]="registerName" (keyup.enter)="register()"
-             placeholder="Your name" autocomplete="off">
+             (ngModelChange)="registerError=''"
+             placeholder="Your name" autocomplete="off"
+             [class.reg-input-error]="registerError">
       <label class="reg-sm">
         <input type="checkbox" [(ngModel)]="registerAsSM"> as scrum master
       </label>
@@ -21,6 +24,9 @@
               [disabled]="!registerName.trim() || !registerRoom.trim()">
         Join
       </button>
+      @if (registerError) {
+        <span class="reg-error">⚠ {{ registerError }}</span>
+      }
     </div>
   </div>
 }
@@ -158,6 +164,11 @@
               {{ p.name }}
               @if (p.isSM) { <mat-icon class="pc-star">star</mat-icon> }
             </span>
+            @if (isScrumMaster && missCount[p.name]) {
+              <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">
+                {{ missEmoji(missCount[p.name]) }}{{ missCount[p.name] }}
+              </span>
+            }
           </div>
         }
 
