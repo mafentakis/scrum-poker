@@ -43,7 +43,8 @@ Role is self-selected at registration (no authentication required).
 | Event | Behaviour |
 |---|---|
 | Join (WS `join` message) | Added to room if not present; reconnected if name already exists |
-| Page refresh / network blip | WS closes but participant **stays** in room — reconnects on reload |
+| Page refresh / network blip | WS closes; participant **stays** for a 30 s grace period — reconnects on reload, timer cancelled |
+| No reconnect within 30 s | Participant **automatically removed** from room and team strip updated |
 | Logout (WS `leave` message) | Participant **removed** from room immediately |
 | Server restart | All rooms and participants lost (in-memory only) |
 
@@ -232,6 +233,7 @@ Pre-fills the registration form on reload. Cleared on logout.
 - **As a user**, if I try to join with a name already taken by an active connection, I see an inline error and the name field turns red — so I know to pick a different name.
 - **As a user**, if I try to join as Scrum Master but the room already has one, I see an inline error naming the existing SM — so I understand why I can't take that role.
 - **As a user**, I can click **Leave session** in the toolbar to log out and immediately free my name and role in the room.
+- **As a team**, when a participant closes their tab or loses connectivity and doesn't reconnect within 30 seconds, they are automatically removed from the room — so the team strip doesn't accumulate ghost participants from people who left without logging out.
 
 ### Voting
 
