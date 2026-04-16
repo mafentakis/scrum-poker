@@ -43,7 +43,7 @@ Role is self-selected at registration (no authentication required).
 | Event | Behaviour |
 |---|---|
 | Join (WS `join` message) | Added to room if not present; previous state (vote, SM role, avatar) restored if name already exists |
-| Page refresh / network blip | WS closes; chip immediately dims and shows "offline" (light gray) — participant **stays in the room indefinitely** until they reconnect or log out |
+| Page refresh / network blip | WS closes; chip immediately fades to 40% opacity (tooltip shows "offline") — participant **stays in the room indefinitely** until they reconnect or log out |
 | Reconnect | Vote, SM role, and avatar fully restored — no data loss as long as the server hasn't restarted |
 | Logout (WS `leave` message) | Participant **removed** from room immediately |
 | All participants offline | Room **cleanup timer** starts (default 30 s, configurable via `ROOM_EMPTY_TTL_MS`). Cancelled immediately if anyone reconnects |
@@ -93,12 +93,18 @@ Role is self-selected at registration (no authentication required).
 ## Team Strip
 
 - Compact horizontal row, always visible (~80 px height).
-- Each participant card shows:
-  - **Not voted**: `?` (light background)
-  - **Voted, not revealed**: `✓` (dark purple fill — value hidden)
-  - **Revealed, voted**: numeric value
+- Each participant chip uses **two independent visual signals**:
+  - **Voted badge**: charcoal `#374151` circle (bottom-left corner, 16 px) with a `✓` — present when voted, absent when not. Hidden after reveal (value is sufficient).
+  - **Offline opacity**: whole chip fades to `opacity: 0.4` when offline. No text label — "offline" shown as tooltip on hover only.
+- Face is always **neutral light gray** regardless of vote state — the badge is the only voted indicator.
+- Opacity is **state-agnostic**: online voted = online unvoted (full); offline voted = offline unvoted (40%).
+- Chip states:
+  - **Not voted, online**: gray face, `?`, no badge, full opacity
+  - **Voted, online**: gray face, `?`, charcoal ✓ badge, full opacity
+  - **Not voted, offline**: gray face, `?`, no badge, 40% opacity
+  - **Voted, offline**: gray face, `?`, charcoal ✓ badge, 40% opacity
+  - **Revealed, voted**: numeric value shown in face; badge hidden
   - **Revealed, not voted**: `?` with red alert highlight
-- ★ star indicates SM role.
 - Vote count pill: `3 / 5 voted`.
 - After reveal: **Average** score circle (numeric votes only).
 
@@ -109,15 +115,7 @@ Role is self-selected at registration (no authentication required).
 - When the countdown timer reaches 0, any **non-SM participant** who has **not yet voted** has their miss count incremented by 1. The Scrum Master is never penalised.
 - The miss count persists for the **entire session** (survives new rounds; resets only on server restart).
 - **Visible to all participants** — everyone in the room sees the badges.
-- Each participant chip shows a small playful badge below their name when they have ≥ 1 miss:
-
-| Count | Badge | Meaning |
-|---|---|---|
-| 1 | ⏰ | Late once |
-| 2 | 🐢 | Slow |
-| 3–4 | 😴 | Checked out |
-| 5+ | 💀 | Hopeless |
-
+- Each participant chip shows a small monochrome **`×N` pill** (charcoal `#374151`, white text, bottom-right corner) when they have ≥ 1 miss. Matches the voted-badge visual system.
 - Hovering the badge shows a tooltip: "Missed N deadline(s)".
 
 ---
@@ -214,7 +212,7 @@ Pre-fills the registration form on reload. Cleared on logout.
 - **Color philosophy**: Minimalistic and professional — almost no color. Accent is charcoal, not a brand hue.
 - **Primary accent**: `#374151` (charcoal) / `#1F2937` (near-black) / `#F3F4F6` (light grey surface)
 - **Toolbar background**: `#f5f5f5` — light, quiet, low-contrast
-- **Voted card fill**: `#1F2937` dark charcoal (signals commitment without distracting color)
+- **Voted signal**: charcoal `#374151` circle badge (bottom-left, 16 px `✓`) — face stays neutral gray; badge is the only voted indicator
 - **Timer warning**: `#ef6c00` orange (≤ 30 s) → `#c62828` red + pulse (≤ 10 s) — the only intentional color moments
 - **Ghost actions**: Secondary toolbar icons at `rgba(0,0,0,0.28)`, full opacity on hover — reduce visual noise at rest
 - **No progress bar** — removed; timer state communicated by MM:SS color alone
@@ -303,7 +301,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 
 ### Miss Score (Deadline Tracker)
 
-- **As any participant**, I can see a playful emoji badge on each team member's chip showing how many timer deadlines they have missed this session — ⏰ (1), 🐢 (2), 😴 (3–4), 💀 (5+) — so the team has a lighthearted way to track responsiveness.
+- **As any participant**, I can see a monochrome `×N` pill badge on each team member's chip showing how many timer deadlines they have missed this session — so the team has a clear, unobtrusive way to track responsiveness.
 - **As the SM**, I am never given a miss badge or timeout alert — I control the timer and am not expected to vote.
 - **As any participant**, hovering a miss badge shows a tooltip "Missed N deadline(s)".
 - **As any participant**, miss counts survive new rounds and only reset on server restart.
@@ -324,7 +322,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As a user**, a monochrome dot in the toolbar shows my WebSocket connection status (grey = connected, red = reconnecting) — so I know if I'm live without a distracting green light at rest.
 - **As a user**, when I lose internet I see a clear "Offline — reconnecting…" overlay rather than a frozen screen — so I know the app is trying to reconnect.
 - **As a user**, when I'm offline the room meta line shows "· offline" in red — so I can tell at a glance the session is disconnected without needing to find the status dot.
-- **As any participant**, when a teammate (including the Scrum Master) disconnects, their card is immediately dimmed and shows "offline" in light gray below their name — so the team knows they are temporarily away but still in the room.
+- **As any participant**, when a teammate disconnects, their entire chip fades to 40% opacity — no text label, "offline" shown as a tooltip on hover — so the team knows they are temporarily away without cluttering the strip.
 
 ### Timer
 
@@ -334,7 +332,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 
 - **As a user**, the toolbar is quiet and low-contrast (`#f5f5f5` background, ghost icons) — so the UI stays out of the way during a meeting and doesn't compete with the content.
 - **As a user**, secondary toolbar actions (Leave, Share, Help) are small ghost icons (28 px, appear on hover) grouped in a right cluster with consistent spacing — so the toolbar has clear visual hierarchy without clutter.
-- **As a user**, voted cards fill with dark charcoal (`#1F2937`) rather than a brand color — so the signal is clear without visual noise.
+- **As a user**, voted chips show a small charcoal `✓` badge (bottom-left) on a neutral gray face — so the voted signal is clear without changing the face color and without ambiguity when offline.
 - **As a user**, the timer is the only element that earns color (orange → red) — so urgent moments stand out against an otherwise monochrome UI.
 - **As a user**, the room name is shown as plain text (no redundant icon) — so the toolbar reads cleanly left-to-right.
 - **As a user**, the Scrum Master is not marked with a star badge — the "created by" line in the room meta already identifies who owns the session, avoiding duplication.

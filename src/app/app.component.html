@@ -179,15 +179,13 @@
                [class.pc-offline]="p.online === false"
                [class.pc-kickable]="isScrumMaster && p.name !== userName"
                (click)="isScrumMaster && p.name !== userName ? kickParticipant(p.name) : null"
-               [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' — click to remove' : p.name">
+               [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' — click to remove' : (p.online === false ? p.name + ' — offline' : p.name)">
             <div class="pc-face">
               @if (cardsRevealed && p.voted) {
                 <span class="pc-value">{{ p.value }}</span>
               } @else if (p.avatar) {
                 <img class="pc-avatar" [src]="p.avatar" alt=""
                      [class.pc-avatar-voted]="p.voted">
-              } @else if (p.voted) {
-                <mat-icon class="pc-check">check</mat-icon>
               } @else {
                 <span class="pc-unknown">?</span>
               }
@@ -195,10 +193,10 @@
                 <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">×{{ missCount[p.name] }}</span>
               }
             </div>
-            <span class="pc-name">
-              {{ p.name }}
-              @if (p.online === false) {<span class="pc-offline">offline</span>}
-            </span>
+            @if (p.voted && !cardsRevealed) {
+              <span class="voted-badge">✓</span>
+            }
+            <span class="pc-name">{{ p.name }}</span>
           </div>
         }
 
