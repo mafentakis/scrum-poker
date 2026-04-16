@@ -58,6 +58,7 @@ Role is self-selected at registration (no authentication required).
 - Selected card is highlighted (lifted, accent border).
 - Cards are disabled after the SM reveals.
 - Corner indices (playing-card style) on each card.
+- Card numbers are muted (`#bdbdbd`, normal weight) at rest — bold dark (`#1F2937`, `font-weight: 700`) when selected, so the chosen value stands out without visual noise at rest.
 
 ---
 
@@ -329,3 +330,4 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As a user**, the room name is shown as plain text (no redundant icon) — so the toolbar reads cleanly left-to-right.
 - **As a user**, the Scrum Master is not marked with a star badge — the "created by" line in the room meta already identifies who owns the session, avoiding duplication.
 - **As a user**, participant names that are too long wrap to a second line rather than being truncated with an ellipsis — so full names are always readable.
+- **As a participant**, card numbers are muted at rest and bold when selected — so the chosen value is instantly visible without all cards competing for attention.

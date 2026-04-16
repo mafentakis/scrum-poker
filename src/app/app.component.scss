@@ -346,6 +346,13 @@
     color: #212121;
   }
 
+  &:active:not([disabled]) {
+    background: rgba(0, 0, 0, 0.18);
+    color: #000;
+    transform: scale(0.9);
+    transition: none;
+  }
+
   &[disabled] { opacity: 0.35; cursor: default; }
   &:focus-visible { outline: 2px solid #374151; outline-offset: 1px; }
 }
@@ -435,8 +442,8 @@
 
   .mc-val {
     font-size: 1rem;
-    font-weight: 600;
-    color: #333;
+    font-weight: 400;
+    color: #bdbdbd;
   }
 
   .mc-corner {
@@ -460,7 +467,8 @@
     border-color: #374151;
     box-shadow: 0 4px 12px rgba(55,65,81,0.25);
     transform: translateY(-4px);
-    .mc-val, .mc-corner { color: #1F2937; }
+    .mc-val { color: #1F2937; font-weight: 700; }
+    .mc-corner { color: #1F2937; }
   }
 
   &.mc-disabled {
