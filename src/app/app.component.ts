@@ -93,13 +93,6 @@ export class AppComponent implements OnInit, OnDestroy {
   // ── Miss score ────────────────────────────────────────
   missCount: Record<string, number> = {};
 
-  missEmoji(count: number): string {
-    if (count >= 5) return '💀';
-    if (count >= 3) return '😴';
-    if (count >= 2) return '🐢';
-    return '⏰';
-  }
-
   // ── Jira ──────────────────────────────────────────────
   jiraUrl    = '';
   jiraLoaded = false;

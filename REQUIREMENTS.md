@@ -35,18 +35,26 @@ Role is self-selected at registration (no authentication required).
 
 - Each room is an isolated session: separate participants, votes, timer, and Jira URL.
 - Any user can create a room simply by entering a new room name.
-- Rooms are kept **in-memory** on the server; a background sweep **deletes rooms that have been idle for more than 1 month**.
+- Rooms are kept **in-memory** on the server; destroyed either when idle for **10 minutes** (hourly sweep) or **30 seconds after all participants disconnect** — whichever comes first. Both thresholds are configurable.
 - Server status endpoint `GET /` returns a JSON summary of active rooms (name, participant count, last activity).
 
 ### Participant lifecycle
 
 | Event | Behaviour |
 |---|---|
-| Join (WS `join` message) | Added to room if not present; reconnected if name already exists |
-| Page refresh / network blip | WS closes; participant **stays** for a 30 s grace period — card immediately dims and shows "offline"; reconnects on reload |
-| No reconnect within 30 s | Participant **automatically removed** from room and team strip updated |
+| Join (WS `join` message) | Added to room if not present; previous state (vote, SM role, avatar) restored if name already exists |
+| Page refresh / network blip | WS closes; chip immediately dims and shows "offline" (light gray) — participant **stays in the room indefinitely** until they reconnect or log out |
+| Reconnect | Vote, SM role, and avatar fully restored — no data loss as long as the server hasn't restarted |
 | Logout (WS `leave` message) | Participant **removed** from room immediately |
+| All participants offline | Room **cleanup timer** starts (default 30 s, configurable via `ROOM_EMPTY_TTL_MS`). Cancelled immediately if anyone reconnects |
+| Cleanup timer expires | Room destroyed — all state lost |
 | Server restart | All rooms and participants lost (in-memory only) |
+
+### Room TTL
+
+- Rooms that have been **idle for more than 10 minutes** (configurable via `ROOM_TTL_MS`) are swept by an hourly background job.
+- Additionally, a room is destroyed **30 seconds after the last participant goes offline** (configurable via `ROOM_EMPTY_TTL_MS`), so abandoned sessions don't linger.
+- The two TTLs are independent — whichever fires first cleans up the room.
 
 ---
 
@@ -156,7 +164,7 @@ Total height: 120 px  (fixed, resize-locked in standalone PWA)
 - **Transport**: WebSocket (`/ws`) — real-time, bidirectional.
 - **State**: In-memory `Map<roomName, RoomState>`.
 - **Timer**: Server-side `setInterval` per room; broadcasts `state` every second and `timerEnd` at zero.
-- **Room cleanup**: Hourly sweep deletes rooms idle > 1 month.
+- **Room cleanup**: Two mechanisms — hourly sweep deletes rooms idle > 10 min (`ROOM_TTL_MS`); per-room timer destroys room 30 s after last participant goes offline (`ROOM_EMPTY_TTL_MS`).
 - **Status API**: `GET /` returns active room summary (JSON).
 
 ### WebSocket message types
@@ -257,7 +265,8 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As a user**, I can click **Leave session** in the toolbar to log out and immediately free my name and role in the room.
 - **As the SM**, I can click any participant's card (other than my own) to remove them from the session — a confirmation prompt is shown first, the card highlights red on hover as a visual cue, and the participant is immediately removed for all clients.
 - **As a removed participant**, I am shown a "You have been removed from the session" message and returned to the login screen — my session is cleared so I cannot silently rejoin without going through registration again.
-- **As a team**, when a participant closes their tab or loses connectivity and doesn't reconnect within 30 seconds, they are automatically removed from the room — so the team strip doesn't accumulate ghost participants from people who left without logging out.
+- **As a team**, when a participant closes their tab or loses connectivity their chip dims and shows "offline" — they stay in the room indefinitely so their vote is preserved and they can reconnect at any time without losing state.
+- **As a team**, when the last participant goes offline the room is automatically destroyed after 30 seconds of being fully empty — so abandoned sessions don't linger on the server.
 
 ### Voting
 
@@ -315,7 +324,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As a user**, a monochrome dot in the toolbar shows my WebSocket connection status (grey = connected, red = reconnecting) — so I know if I'm live without a distracting green light at rest.
 - **As a user**, when I lose internet I see a clear "Offline — reconnecting…" overlay rather than a frozen screen — so I know the app is trying to reconnect.
 - **As a user**, when I'm offline the room meta line shows "· offline" in red — so I can tell at a glance the session is disconnected without needing to find the status dot.
-- **As any participant**, when a teammate (including the Scrum Master) disconnects, their card is immediately dimmed and shows "offline" in red below their name — so the team knows they are in the 30 s grace period and not yet removed.
+- **As any participant**, when a teammate (including the Scrum Master) disconnects, their card is immediately dimmed and shows "offline" in light gray below their name — so the team knows they are temporarily away but still in the room.
 
 ### Timer
 

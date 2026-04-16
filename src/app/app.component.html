@@ -192,7 +192,7 @@
                 <span class="pc-unknown">?</span>
               }
               @if (missCount[p.name]) {
-                <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">{{ missEmoji(missCount[p.name]) }}</span>
+                <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">×{{ missCount[p.name] }}</span>
               }
             </div>
             <span class="pc-name">
