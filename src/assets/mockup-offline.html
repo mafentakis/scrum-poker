@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Offline State Mockups</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+    background: #f0f0f0;
+    padding: 32px 24px 48px;
+    color: #212121;
+  }
+
+  h1 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+    letter-spacing: 0.2px;
+  }
+  .subtitle {
+    font-size: 0.78rem;
+    color: #9e9e9e;
+    margin-bottom: 32px;
+  }
+
+  /* ── Section ── */
+  .section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 24px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 12px;
+  }
+
+  .option-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    background: #374151;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .option-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .option-desc {
+    font-size: 0.75rem;
+    color: #9e9e9e;
+    margin-left: auto;
+  }
+
+  /* ── Chip grid ── */
+  .chip-row {
+    display: flex;
+    gap: 28px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .chip-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .state-label {
+    font-size: 0.62rem;
+    color: #bdbdbd;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* ── Base chip ── */
+  .chip {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .face {
+    width: 38px;
+    height: 52px;
+    border-radius: 6px;
+    border: 1.5px solid #e0e0e0;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .face.voted {
+    background: #1F2937;
+    border-color: #111827;
+  }
+
+  .face-q { font-size: 1.1rem; color: #bdbdbd; }
+  .face-check { font-size: 1.2rem; color: white; }
+
+  .name {
+    font-size: 0.68rem;
+    color: #757575;
+    text-align: center;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  .offline-tag {
+    display: block;
+    font-size: 0.6rem;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  /* ── Current (baseline) ── */
+  .current .face.offline-face { opacity: 0.4; }
+  .current .offline-tag { color: #c62828; } /* red — the problem */
+
+  /* ── Option A: dashed border ── */
+  .opt-a .face.offline-face {
+    border: 1.5px dashed #f59e0b;
+  }
+  .opt-a .face.offline-face.voted {
+    border: 1.5px dashed #f59e0b;
+  }
+  .opt-a .offline-tag { color: #9e9e9e; }
+
+  /* ── Option B: wifi-off icon overlay ── */
+  .opt-b .face.offline-face::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.0);
+  }
+  .wifi-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #616161;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid white;
+    font-size: 10px;
+    color: white;
+    line-height: 1;
+  }
+  .opt-b .offline-tag { color: #9e9e9e; }
+
+  /* ── Option C: color tint ── */
+  .opt-c .face.offline-face {
+    background: #dce8f5;
+    border-color: #90b8d8;
+  }
+  .opt-c .face.offline-face.voted {
+    background: #1a3550;
+    border-color: #2d5f8a;
+    opacity: 0.85;
+  }
+  .opt-c .offline-tag { color: #9e9e9e; }
+
+  /* ── Option D: diagonal stripe ── */
+  .opt-d .face.offline-face::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      rgba(0,0,0,0.1) 4px,
+      rgba(0,0,0,0.1) 5px
+    );
+    border-radius: 4px;
+  }
+  .opt-d .offline-tag { color: #9e9e9e; }
+
+  /* ── Divider ── */
+  .chip-divider {
+    width: 1px;
+    height: 60px;
+    background: #e0e0e0;
+    align-self: center;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    font-size: 0.68rem;
+    color: #9e9e9e;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    flex-shrink: 0;
+  }
+  .legend-dot.voted { background: #1F2937; }
+</style>
+</head>
+<body>
+
+<h1>Offline State — Design Variants</h1>
+<p class="subtitle">Each option shows 4 chip states: unvoted online · voted online · unvoted offline · voted offline</p>
+
+<!-- ══ CURRENT (baseline) ══ -->
+<div class="section current">
+  <div class="section-header">
+    <span class="option-tag" style="background:#9e9e9e">Current</span>
+    <span class="option-title">Opacity fade · offline label in red</span>
+    <span class="option-desc">Problem: faded unvoted ≈ faded voted — both look "unclear"</span>
+  </div>
+  <div class="chip-row">
+    <div class="chip-group">
+      <div class="chip"><div class="face"><span class="face-q">?</span></div></div>
+      <div class="name">Alice</div>
+      <div class="state-label">unvoted<br>online</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted"><span class="face-check">✓</span></div></div>
+      <div class="name">Bob</div>
+      <div class="state-label">voted<br>online</div>
+    </div>
+    <div class="chip-divider"></div>
+    <div class="chip-group">
+      <div class="chip"><div class="face offline-face"><span class="face-q">?</span></div></div>
+      <div class="name">Carol<span class="offline-tag">offline</span></div>
+      <div class="state-label">unvoted<br>offline</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted offline-face"><span class="face-check">✓</span></div></div>
+      <div class="name">Dave<span class="offline-tag">offline</span></div>
+      <div class="state-label">voted<br>offline</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot"></div> Gray face = unvoted</div>
+    <div class="legend-item"><div class="legend-dot voted"></div> Dark face = voted</div>
+    <div class="legend-item" style="color:#c62828">⚠ Voted+offline (40% dark) ≈ Unvoted+online (100% gray) — ambiguous</div>
+  </div>
+</div>
+
+<!-- ══ OPTION A: Dashed border ══ -->
+<div class="section opt-a">
+  <div class="section-header">
+    <span class="option-tag">A</span>
+    <span class="option-title">Dashed amber border · no opacity change</span>
+    <span class="option-desc">Dashed = "connection broken" — keeps voted/unvoted contrast intact</span>
+  </div>
+  <div class="chip-row">
+    <div class="chip-group">
+      <div class="chip"><div class="face"><span class="face-q">?</span></div></div>
+      <div class="name">Alice</div>
+      <div class="state-label">unvoted<br>online</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted"><span class="face-check">✓</span></div></div>
+      <div class="name">Bob</div>
+      <div class="state-label">voted<br>online</div>
+    </div>
+    <div class="chip-divider"></div>
+    <div class="chip-group">
+      <div class="chip"><div class="face offline-face"><span class="face-q">?</span></div></div>
+      <div class="name">Carol<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">unvoted<br>offline</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted offline-face"><span class="face-check">✓</span></div></div>
+      <div class="name">Dave<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">voted<br>offline</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item">✅ Voted+offline stays dark — no ambiguity with unvoted</div>
+    <div class="legend-item" style="color:#9e9e9e">⚠ Dashes may be too subtle at this chip size</div>
+  </div>
+</div>
+
+<!-- ══ OPTION B: Icon overlay ══ -->
+<div class="section opt-b">
+  <div class="section-header">
+    <span class="option-tag">B</span>
+    <span class="option-title">Wifi-off badge · no opacity change</span>
+    <span class="option-desc">Explicit icon in corner — voted/unvoted and offline are fully independent signals</span>
+  </div>
+  <div class="chip-row">
+    <div class="chip-group">
+      <div class="chip"><div class="face"><span class="face-q">?</span></div></div>
+      <div class="name">Alice</div>
+      <div class="state-label">unvoted<br>online</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted"><span class="face-check">✓</span></div></div>
+      <div class="name">Bob</div>
+      <div class="state-label">voted<br>online</div>
+    </div>
+    <div class="chip-divider"></div>
+    <div class="chip-group">
+      <div class="chip">
+        <div class="face offline-face"><span class="face-q">?</span></div>
+        <div class="wifi-badge">✕</div>
+      </div>
+      <div class="name">Carol<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">unvoted<br>offline</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip">
+        <div class="face voted offline-face"><span class="face-check">✓</span></div>
+        <div class="wifi-badge">✕</div>
+      </div>
+      <div class="name">Dave<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">voted<br>offline</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item">✅ Both states fully readable — offline is an additive indicator</div>
+    <div class="legend-item" style="color:#9e9e9e">⚠ Adds visual element — badge competes with miss-badge (×N) if both present</div>
+  </div>
+</div>
+
+<!-- ══ OPTION C: Color tint ══ -->
+<div class="section opt-c">
+  <div class="section-header">
+    <span class="option-tag">C</span>
+    <span class="option-title">Steel-blue tint · no opacity change</span>
+    <span class="option-desc">"Cold/away" color — third distinct channel for offline state</span>
+  </div>
+  <div class="chip-row">
+    <div class="chip-group">
+      <div class="chip"><div class="face"><span class="face-q">?</span></div></div>
+      <div class="name">Alice</div>
+      <div class="state-label">unvoted<br>online</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted"><span class="face-check">✓</span></div></div>
+      <div class="name">Bob</div>
+      <div class="state-label">voted<br>online</div>
+    </div>
+    <div class="chip-divider"></div>
+    <div class="chip-group">
+      <div class="chip"><div class="face offline-face"><span class="face-q" style="color:#90b8d8">?</span></div></div>
+      <div class="name">Carol<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">unvoted<br>offline</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted offline-face"><span class="face-check">✓</span></div></div>
+      <div class="name">Dave<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">voted<br>offline</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item">✅ Unvoted+offline (blue) clearly ≠ Unvoted+online (gray)</div>
+    <div class="legend-item" style="color:#9e9e9e">⚠ Breaks monochrome palette — introduces blue into the design system</div>
+  </div>
+</div>
+
+<!-- ══ OPTION D: Diagonal stripe ══ -->
+<div class="section opt-d">
+  <div class="section-header">
+    <span class="option-tag">D</span>
+    <span class="option-title">Diagonal hatch overlay · no opacity change</span>
+    <span class="option-desc">"Hatched = unavailable" — common UI convention, pure CSS, no new colors</span>
+  </div>
+  <div class="chip-row">
+    <div class="chip-group">
+      <div class="chip"><div class="face"><span class="face-q">?</span></div></div>
+      <div class="name">Alice</div>
+      <div class="state-label">unvoted<br>online</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted"><span class="face-check">✓</span></div></div>
+      <div class="name">Bob</div>
+      <div class="state-label">voted<br>online</div>
+    </div>
+    <div class="chip-divider"></div>
+    <div class="chip-group">
+      <div class="chip"><div class="face offline-face"><span class="face-q">?</span></div></div>
+      <div class="name">Carol<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">unvoted<br>offline</div>
+    </div>
+    <div class="chip-group">
+      <div class="chip"><div class="face voted offline-face"><span class="face-check">✓</span></div></div>
+      <div class="name">Dave<span class="offline-tag" style="color:#9e9e9e">offline</span></div>
+      <div class="state-label">voted<br>offline</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item">✅ Voted+offline stays dark and readable</div>
+    <div class="legend-item">✅ Monochrome — no new colors</div>
+    <div class="legend-item" style="color:#9e9e9e">⚠ Hatch on dark voted card may be hard to see</div>
+  </div>
+</div>
+
+</body>
+</html>
