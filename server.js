@@ -7,14 +7,41 @@ const { WebSocketServer } = require('ws');
 // rooms: Map<roomName, RoomState>
 const rooms = new Map();
 
-const ROOM_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 1 month
+const ROOM_TTL_MS       = 10 * 60 * 1000; // 10 minutes idle → sweep
+const ROOM_EMPTY_TTL_MS = 30_000;           // destroy room 30 s after last participant leaves
 
-// ── Disconnect grace period ────────────────────────────
-// If a disconnected participant doesn't reconnect within this window they are
-// removed from the room.  30 s is long enough to survive any page refresh.
-const DISCONNECT_GRACE_MS = 30_000;
-// disconnectTimers: Map<"roomName:participantName", TimeoutHandle>
-const disconnectTimers = new Map();
+// emptyRoomTimers: Map<roomName, TimeoutHandle>
+const emptyRoomTimers = new Map();
+
+function cancelEmptyRoomTimer(roomName) {
+  if (emptyRoomTimers.has(roomName)) {
+    clearTimeout(emptyRoomTimers.get(roomName));
+    emptyRoomTimers.delete(roomName);
+  }
+}
+
+function checkAndScheduleEmptyRoom(roomName) {
+  const room = rooms.get(roomName);
+  if (!room) return;
+  const anyOnline = room.participants.some(p => p.online !== false);
+  if (anyOnline) {
+    cancelEmptyRoomTimer(roomName); // someone is still online — no need for a timer
+    return;
+  }
+  if (emptyRoomTimers.has(roomName)) return; // already scheduled
+  const handle = setTimeout(() => {
+    emptyRoomTimers.delete(roomName);
+    const r = rooms.get(roomName);
+    if (!r) return;
+    // Double-check nobody reconnected
+    if (r.participants.some(p => p.online !== false)) return;
+    if (r.timerInterval) clearInterval(r.timerInterval);
+    rooms.delete(roomName);
+    console.log(`[${roomName}] destroyed — all participants offline for ${ROOM_EMPTY_TTL_MS / 1000}s`);
+  }, ROOM_EMPTY_TTL_MS);
+  emptyRoomTimers.set(roomName, handle);
+  console.log(`[${roomName}] all offline — will destroy in ${ROOM_EMPTY_TTL_MS / 1000}s if no reconnect`);
+}
 
 function getOrCreateRoom(name) {
   if (!rooms.has(name)) {
@@ -169,13 +196,8 @@ wss.on('connection', (ws) => {
         ws.roomName        = roomName;
         ws.participantName = participantName;
 
-        // Cancel any pending removal timer — participant is reconnecting
-        const timerKey = `${roomName}:${participantName}`;
-        if (disconnectTimers.has(timerKey)) {
-          clearTimeout(disconnectTimers.get(timerKey));
-          disconnectTimers.delete(timerKey);
-          console.log(`[${roomName}] "${participantName}" reconnected — removal cancelled`);
-        }
+        // Cancel any pending room-destroy timer — someone is (re)joining
+        cancelEmptyRoomTimer(roomName);
 
         const room = getOrCreateRoom(roomName);
         if (!room.createdBy) room.createdBy = participantName; // first joiner is the creator
@@ -305,17 +327,11 @@ wss.on('connection', (ws) => {
           targetWs.roomName = null;
         }
 
-        // Cancel any pending disconnect timer so they don't get re-added
-        const kickKey = `${roomName}:${target}`;
-        if (disconnectTimers.has(kickKey)) {
-          clearTimeout(disconnectTimers.get(kickKey));
-          disconnectTimers.delete(kickKey);
-        }
-
         room.participants = room.participants.filter(p => p.name !== target);
         room.lastActivity = Date.now();
         console.log(`[${roomName}] "${ws.participantName}" kicked "${target}"`);
         broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
+        checkAndScheduleEmptyRoom(roomName);
         break;
       }
 
@@ -326,6 +342,7 @@ wss.on('connection', (ws) => {
           ws.participantName = null;
           ws.roomName        = null;
           broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
+          checkAndScheduleEmptyRoom(roomName);
         }
         break;
       }
@@ -336,34 +353,17 @@ wss.on('connection', (ws) => {
     const { roomName, participantName } = ws;
     if (!roomName || !participantName) return;
 
-    // Mark participant as offline immediately so the team sees it during grace period
-    const roomOnClose = rooms.get(roomName);
-    if (roomOnClose) {
-      const p = roomOnClose.participants.find(p => p.name === participantName);
-      if (p) { p.online = false; broadcastRoom(roomName, { type: 'state', data: snapshot(roomOnClose) }); }
+    // Mark participant offline — they stay in the room indefinitely until they reconnect
+    const room = rooms.get(roomName);
+    if (room) {
+      const p = room.participants.find(p => p.name === participantName);
+      if (p) {
+        p.online = false;
+        broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
+        console.log(`[${roomName}] "${participantName}" disconnected — marked offline`);
+      }
+      checkAndScheduleEmptyRoom(roomName);
     }
-
-    // Give the client DISCONNECT_GRACE_MS to reconnect (page refresh, brief blip).
-    // If they don't come back in time, remove them from the room.
-    const timerKey = `${roomName}:${participantName}`;
-    if (disconnectTimers.has(timerKey)) return; // already scheduled
-
-    const handle = setTimeout(() => {
-      disconnectTimers.delete(timerKey);
-      const room = rooms.get(roomName);
-      if (!room) return;
-      // Only remove if no active connection has reclaimed this name
-      const stillConnected = [...wss.clients].some(
-        c => c.readyState === 1 && c.roomName === roomName && c.participantName === participantName
-      );
-      if (stillConnected) return;
-      room.participants = room.participants.filter(p => p.name !== participantName);
-      console.log(`[${roomName}] "${participantName}" removed after disconnect timeout (${room.participants.length} remaining)`);
-      broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
-    }, DISCONNECT_GRACE_MS);
-
-    disconnectTimers.set(timerKey, handle);
-    console.log(`[${roomName}] "${participantName}" disconnected — will remove in ${DISCONNECT_GRACE_MS / 1000}s if no reconnect`);
   });
 
   ws.on('error', err => console.error('[ws error]', err.message));
