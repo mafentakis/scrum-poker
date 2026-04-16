@@ -16,7 +16,7 @@
     }
 
     header {
-      background: #616161;
+      background: #374151;
       color: white;
       padding: 14px 32px;
       display: flex;
@@ -49,7 +49,7 @@
       white-space: nowrap;
       transition: color .15s, border-color .15s;
     }
-    nav a:hover { color: #5c35b5; border-bottom-color: #5c35b5; }
+    nav a:hover { color: #374151; border-bottom-color: #374151; }
 
     main {
       max-width: 860px;
@@ -62,22 +62,23 @@
     h2 {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #4527a0;
+      color: #1F2937;
       margin-bottom: 16px;
       padding-bottom: 8px;
-      border-bottom: 2px solid #ede7f6;
+      border-bottom: 2px solid #e5e7eb;
     }
 
     h3 {
       font-size: 1rem;
       font-weight: 600;
-      color: #333;
+      color: #374151;
       margin: 20px 0 8px;
     }
 
     p { margin-bottom: 12px; color: #424242; }
 
-    figure {
+    /* ── UI mockup frames ─────────────────────────── */
+    .mockup {
       margin: 20px 0;
       background: white;
       border: 1px solid #e0e0e0;
@@ -85,12 +86,7 @@
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,.07);
     }
-    figure img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-    figcaption {
+    .mockup-caption {
       padding: 10px 16px;
       font-size: 0.82rem;
       color: #757575;
@@ -98,6 +94,119 @@
       border-top: 1px solid #f0f0f0;
     }
 
+    /* Toolbar mock */
+    .toolbar-mock {
+      background: #f5f5f5;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #616161;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .tb-logo { font-size: 14px; color: #9e9e9e; }
+    .tb-room { font-weight: 500; color: #424242; margin-left: 2px; }
+    .tb-meta { font-size: 0.67rem; color: #bdbdbd; margin-left: 4px; }
+    .tb-spacer { flex: 1; }
+    .tb-time { font-family: monospace; font-weight: 600; font-size: 0.75rem; letter-spacing: 1px; }
+    .tb-time.normal { color: #bdbdbd; }
+    .tb-time.warning { color: #ef6c00; }
+    .tb-time.danger { color: #c62828; }
+    .tb-time.overtime { color: #c62828; }
+    .tb-icon { width: 26px; height: 26px; border-radius: 50%; background: transparent;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #757575; cursor: default; }
+    .tb-icon:hover { background: rgba(0,0,0,.08); color: #212121; }
+    .dur-chip {
+      height: 18px; padding: 0 5px; border: 1px solid transparent; border-radius: 9px;
+      background: transparent; color: #9e9e9e; font-size: 0.65rem; cursor: default;
+    }
+    .dur-chip.active { background: #374151; color: white; font-weight: 600; }
+    .timer-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #e0e0e0; border-radius: 6px; padding: 0 8px; height: 26px;
+    }
+    .tb-divider { width: 1px; height: 18px; background: #e0e0e0; margin: 0 6px; }
+    .conn-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .conn-dot.on { background: #9e9e9e; }
+    .conn-dot.off { background: #ef9a9a; }
+    .user-chip { display: inline-flex; align-items: center; gap: 3px; font-size: 0.78rem; color: #616161; }
+    .avatar-circle { width: 20px; height: 20px; border-radius: 50%; background: #e0e0e0;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 11px; border: 1.5px solid #e0e0e0; }
+
+    /* Strip mock */
+    .strip-mock {
+      background: #fafafa;
+      height: 80px;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 12px 20px;
+      gap: 6px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .card-mock {
+      width: 38px; height: 52px; border-radius: 5px; border: 1.5px solid #d0d0d0;
+      background: white; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 400; color: #bdbdbd; position: relative;
+      box-shadow: 0 1px 4px rgba(0,0,0,.1); flex-shrink: 0;
+    }
+    .card-mock.selected {
+      background: #F3F4F6; border-color: #374151;
+      box-shadow: 0 4px 12px rgba(55,65,81,.25); transform: translateY(-4px);
+      font-weight: 700; color: #1F2937;
+    }
+    .card-mock.revealed { font-weight: 600; color: #333; border-color: #374151; }
+    .card-mock .corner { position: absolute; font-size: 0.45rem; font-weight: 600; color: #ccc; line-height: 1; }
+    .card-mock .corner.tl { top: 3px; left: 3px; }
+    .card-mock .corner.br { bottom: 3px; right: 3px; transform: rotate(180deg); }
+
+    .strip-sep-mock { width: 1px; height: 56px; background: #e0e0e0; margin: 0 8px; align-self: center; }
+
+    .chip-mock {
+      display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0;
+    }
+    .chip-face {
+      width: 46px; height: 46px; border-radius: 8px; border: 2px solid #e0e0e0;
+      background: white; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; position: relative;
+    }
+    .chip-face.voted { background: #1F2937; color: white; border-color: #1F2937; }
+    .chip-face.me { border-color: #374151; box-shadow: 0 0 0 2px #F3F4F6; }
+    .chip-face.offline { opacity: 0.4; }
+    .chip-name { font-size: 0.62rem; color: #757575; text-align: center; max-width: 52px; }
+    .chip-name .offline-label { display: block; font-size: 0.6rem; color: #c62828; }
+
+    .avg-chip-mock {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      width: 46px; height: 46px; border-radius: 50%; border: 2px solid #4caf50;
+      background: white; justify-content: center;
+    }
+    .avg-val { font-size: 1rem; font-weight: 700; color: #2e7d32; line-height: 1; }
+    .avg-lbl { font-size: 0.5rem; color: #9e9e9e; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .miss-badge { position: absolute; bottom: -2px; right: -2px; font-size: 0.7rem; line-height: 1; }
+
+    /* Reg bar mock */
+    .reg-mock {
+      background: #f5f5f5;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .reg-input-mock {
+      border: 1px solid #d0d0d0; border-radius: 4px; padding: 5px 10px;
+      font-size: 0.82rem; color: #424242; background: white; width: 120px;
+    }
+    .reg-input-mock.error { border-color: #c62828; }
+    .reg-btn { background: #374151; color: white; border: none; border-radius: 4px;
+      padding: 6px 16px; font-size: 0.82rem; cursor: default; }
+    .reg-label { font-size: 0.78rem; color: #616161; display: flex; align-items: center; gap: 4px; }
+
+    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -107,39 +216,23 @@
     th {
       text-align: left;
       padding: 8px 12px;
-      background: #ede7f6;
-      color: #4527a0;
+      background: #F3F4F6;
+      color: #1F2937;
       font-weight: 600;
     }
-    td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; color: #424242; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafafa; }
 
-    .badge-row { display: flex; gap: 24px; flex-wrap: wrap; margin: 12px 0; }
+    /* Badge row */
+    .badge-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0; }
     .badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.9rem;
+      display: flex; align-items: center; gap: 8px; background: white;
+      border: 1px solid #e0e0e0; border-radius: 8px; padding: 8px 14px; font-size: 0.9rem;
     }
     .badge .emoji { font-size: 1.4rem; }
     .badge .label { color: #424242; }
     .badge .count { font-weight: 600; color: #e65100; }
-
-    .chip {
-      display: inline-block;
-      background: #ede7f6;
-      color: #4527a0;
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 12px;
-      margin: 0 2px;
-    }
 
     code {
       font-family: 'Cascadia Code', 'Fira Code', monospace;
@@ -148,20 +241,23 @@
       border: 1px solid #e0e0e0;
       border-radius: 4px;
       padding: 1px 6px;
-      color: #5c35b5;
+      color: #374151;
     }
 
-    ul { padding-left: 20px; color: #424242; }
-    ul li { margin-bottom: 6px; }
+    ul, ol { padding-left: 20px; color: #424242; }
+    ul li, ol li { margin-bottom: 6px; }
+
+    .tip {
+      background: #F3F4F6; border-left: 3px solid #374151;
+      padding: 10px 14px; border-radius: 0 6px 6px 0;
+      font-size: 0.88rem; color: #374151; margin: 12px 0;
+    }
 
     footer {
-      text-align: center;
-      font-size: 0.8rem;
-      color: #9e9e9e;
-      padding: 24px;
-      border-top: 1px solid #e0e0e0;
-      margin-top: 40px;
+      text-align: center; font-size: 0.8rem; color: #9e9e9e;
+      padding: 24px; border-top: 1px solid #e0e0e0; margin-top: 40px;
     }
+    footer a { color: #9e9e9e; }
   </style>
 </head>
 <body>
@@ -179,7 +275,7 @@
   <a href="#miss">Miss tracker</a>
   <a href="#jira">Jira</a>
   <a href="#sm">Scrum Master</a>
-  <a href="#roles">Roles</a>
+  <a href="#presence">Presence &amp; offline</a>
 </nav>
 
 <main>
@@ -187,81 +283,225 @@
   <!-- Getting started -->
   <section id="getting-started">
     <h2>Getting started</h2>
-    <p>On first visit you see the registration bar. Enter a <strong>room name</strong> (any text — shared with your team), your <strong>display name</strong>, and optionally tick <em>"as scrum master"</em>. Then press <strong>Join</strong> or hit Enter.</p>
-    <figure>
-      <img src="screenshots/screenshot-login.png" alt="Login bar">
-      <figcaption>Registration bar — enter room, name, and SM role. Pre-filled from your last session.</figcaption>
-    </figure>
+    <p>On first visit you see the registration bar. Enter a <strong>room name</strong> (shared with your team), your <strong>display name</strong>, and optionally tick <em>"as scrum master"</em>. Then press <strong>Join</strong> or hit Enter.</p>
+
+    <div class="mockup">
+      <div style="background:#f5f5f5; padding: 8px 16px; display:flex; align-items:center; gap:6px; border-bottom:1px solid #e0e0e0;">
+        <span style="font-size:14px; color:#9e9e9e;">♠</span>
+        <span style="font-size:0.78rem; font-weight:500; color:#424242;">Scrum Poker</span>
+      </div>
+      <div class="reg-mock">
+        <input class="reg-input-mock" value="Team Alpha Sprint 42" readonly>
+        <input class="reg-input-mock" value="Alice" readonly>
+        <span style="font-size:20px; color:#bdbdbd; cursor:default;" title="Add photo">📷</span>
+        <label class="reg-label"><input type="checkbox" disabled> as scrum master</label>
+        <button class="reg-btn">Join</button>
+      </div>
+      <div class="mockup-caption">Registration bar — enter room name and your display name. Pre-filled from your last session.</div>
+    </div>
+
     <ul>
-      <li>Your room, name and role are saved in <code>localStorage</code> and pre-filled on reload — rejoin with one click.</li>
-      <li>Room names are case-insensitive. Anyone entering the same room name joins the same session.</li>
-      <li>Two participants cannot have the same name in one room.</li>
-      <li>Only one Scrum Master is allowed per room.</li>
+      <li>Room names are <strong>case-insensitive</strong>. Anyone using the same room name joins the same session.</li>
+      <li>Your room, name, and role are saved in <code>localStorage</code> and pre-filled on reload — rejoin with one click.</li>
+      <li>Two participants cannot share the same name in a room.</li>
+      <li>Only one Scrum Master is allowed per room at a time.</li>
+      <li>Optionally upload a <strong>profile photo</strong> (camera icon) — it appears on your chip and persists across sessions.</li>
     </ul>
   </section>
 
   <!-- Voting -->
   <section id="voting">
     <h2>Voting</h2>
-    <p>Click any card in the Fibonacci deck to cast your vote. You can change it at any time before the SM reveals.</p>
-    <figure>
-      <img src="screenshots/screenshot-voting.png" alt="Voting in progress">
-      <figcaption>Voting in progress — voted cards show ✓ (value hidden). The toolbar shows how many have voted.</figcaption>
-    </figure>
+    <p>Click any card in the Fibonacci deck to cast your vote. You can change it at any time before the SM reveals. <strong>Click your selected card again to undo your vote</strong> — your chip snaps back to <code>?</code> and the count drops.</p>
+
+    <div class="mockup">
+      <div class="toolbar-mock">
+        <span class="tb-logo">♠</span>
+        <span class="tb-room">sprint-42</span>
+        <span class="tb-meta">created by Bob · 5 min ago</span>
+        <span class="tb-spacer"></span>
+        <span class="tb-time normal">02:00</span>
+        <span class="tb-divider"></span>
+        <span style="font-size:0.75rem; color:#9e9e9e;">2&thinsp;/&thinsp;4 voted</span>
+        <div class="tb-divider"></div>
+        <span class="user-chip"><span class="avatar-circle">A</span> Alice</span>
+        <span class="conn-dot on"></span>
+      </div>
+      <div class="strip-mock">
+        <div class="card-mock"><span class="corner tl">1</span>1<span class="corner br">1</span></div>
+        <div class="card-mock"><span class="corner tl">2</span>2<span class="corner br">2</span></div>
+        <div class="card-mock"><span class="corner tl">3</span>3<span class="corner br">3</span></div>
+        <div class="card-mock selected"><span class="corner tl">5</span>5<span class="corner br">5</span></div>
+        <div class="card-mock"><span class="corner tl">8</span>8<span class="corner br">8</span></div>
+        <div class="card-mock"><span class="corner tl">13</span>13<span class="corner br">13</span></div>
+        <div class="card-mock"><span class="corner tl">21</span>21<span class="corner br">21</span></div>
+        <div class="card-mock">?</div>
+        <span class="strip-sep-mock"></span>
+        <div class="chip-mock">
+          <div class="chip-face voted me">✓</div>
+          <div class="chip-name">Alice</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face voted">✓</div>
+          <div class="chip-name">Carol</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face">?</div>
+          <div class="chip-name">Dave</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face">?</div>
+          <div class="chip-name">Eve</div>
+        </div>
+      </div>
+      <div class="mockup-caption">Voting in progress — Alice selected 5 (bold, lifted). Voted chips show ✓ (value hidden). The toolbar shows 2/4 voted.</div>
+    </div>
+
     <table>
       <tr><th>Card state</th><th>What it means</th></tr>
-      <tr><td>? (light)</td><td>Participant has not voted yet</td></tr>
-      <tr><td>✓ (purple)</td><td>Voted — value is hidden until reveal</td></tr>
-      <tr><td>Number</td><td>Value shown after Scrum Master reveals</td></tr>
+      <tr><td>Muted number (light)</td><td>Available to vote — not yet selected</td></tr>
+      <tr><td><strong>Bold number</strong>, lifted</td><td>Your current selection</td></tr>
+      <tr><td>✓ dark chip</td><td>Participant has voted — value hidden until reveal</td></tr>
+      <tr><td>? light chip</td><td>Participant has not yet voted</td></tr>
+      <tr><td>Number on chip</td><td>Vote shown after Scrum Master reveals</td></tr>
     </table>
+
+    <div class="tip">💡 Click your selected card a second time to undo your vote.</div>
     <p>After a page refresh your vote is restored from the server — a network blip won't lose your selection.</p>
   </section>
 
   <!-- Timer -->
   <section id="timer">
     <h2>Timer</h2>
-    <p>The Scrum Master controls a countdown timer visible to everyone. The full-width progress bar below the toolbar changes colour as time runs out.</p>
-    <figure>
-      <img src="screenshots/screenshot-timer.png" alt="Timer in danger state">
-      <figcaption>Timer danger state — bar turns red and pulses at ≤ 10 s. Participants who haven't voted hear a beep.</figcaption>
-    </figure>
+    <p>The Scrum Master controls a countdown timer visible to everyone. The MM:SS display in the toolbar changes colour as time runs out — it is the only intentional colour in an otherwise monochrome UI.</p>
+
+    <div class="mockup">
+      <div class="toolbar-mock">
+        <span class="tb-logo">♠</span>
+        <span class="tb-room">sprint-42</span>
+        <span class="tb-meta">created by Bob · 5 min ago</span>
+        <span class="tb-spacer"></span>
+        <div class="timer-pill">
+          <span class="tb-time danger">00:08</span>
+          <span class="tb-icon">⏸</span>
+          <span class="tb-icon">↺</span>
+          <span class="dur-chip">30s</span>
+          <span class="dur-chip">1 min</span>
+          <span class="dur-chip active">2 min</span>
+          <span class="dur-chip">5 min</span>
+        </div>
+        <span class="tb-icon" style="margin-left:6px;">👁</span>
+        <div class="tb-divider"></div>
+        <span class="user-chip"><span class="avatar-circle">B</span> Bob</span>
+        <span class="conn-dot on"></span>
+      </div>
+      <div class="mockup-caption">SM toolbar at ≤ 10 s — timer goes red. SM sees ▶/⏸, ↺ reset, duration chips, and the Reveal button.</div>
+    </div>
+
     <table>
-      <tr><th>Time remaining</th><th>Bar colour</th><th>Alert</th></tr>
-      <tr><td>&gt; 30 s</td><td>🔵 Blue</td><td>—</td></tr>
-      <tr><td>≤ 30 s</td><td>🟠 Orange</td><td>—</td></tr>
-      <tr><td>≤ 10 s</td><td>🔴 Red + pulse</td><td>Beep for unvoted participants</td></tr>
-      <tr><td>0 s</td><td>—</td><td>Beep + snackbar for unvoted; miss badge recorded</td></tr>
+      <tr><th>Time remaining</th><th>Timer colour</th><th>Alert (non-SM, unvoted only)</th></tr>
+      <tr><td>&gt; 30 s</td><td style="color:#bdbdbd; font-weight:600;">●&nbsp; Muted grey</td><td>—</td></tr>
+      <tr><td>≤ 30 s</td><td style="color:#ef6c00; font-weight:600;">●&nbsp; Orange</td><td>—</td></tr>
+      <tr><td>≤ 10 s</td><td style="color:#c62828; font-weight:600;">●&nbsp; Red (pulsing)</td><td>Short warning beep</td></tr>
+      <tr><td>0 s</td><td>—</td><td>Beep + "Time's up!" snackbar; miss badge recorded</td></tr>
+      <tr><td>Overtime</td><td style="color:#c62828; font-weight:600;">●&nbsp; +1s … +10s (blinking red)</td><td>—</td></tr>
     </table>
-    <p>The timer runs on the server — all participants see the exact same countdown in real time.</p>
-    <p>Available durations: <code>30 s</code> · <code>1 min</code> · <code>1:30</code> · <code>2 min</code> · <code>3 min</code> · <code>5 min</code>.</p>
+
+    <p>After the timer hits zero it shows blinking red overtime (+1s, +2s … +10s) for 10 seconds — so latecomers can see how far over time the team ran. It clears automatically and resets on New Round.</p>
+    <p>The timer runs <strong>server-side</strong> — all participants see the exact same countdown in real time.</p>
+    <p>Available durations: <code>30 s</code> · <code>1 min</code> · <code>1:30</code> · <code>2 min</code> · <code>3 min</code> · <code>5 min</code></p>
   </section>
 
   <!-- Reveal -->
   <section id="reveal">
     <h2>Reveal &amp; New Round</h2>
-    <p>When the SM clicks <strong>Reveal</strong>, all votes are shown simultaneously — preventing anchoring bias. The average (numeric votes only) appears as a circle chip in the team strip.</p>
-    <figure>
-      <img src="screenshots/screenshot-revealed.png" alt="Cards revealed">
-      <figcaption>Cards revealed — values shown, average calculated from numeric votes only.</figcaption>
-    </figure>
-    <p>Click <strong>New Round</strong> to clear all votes and start estimating the next story. Miss counts and the Jira URL are preserved across rounds.</p>
+    <p>When the SM clicks <strong>Reveal</strong> (👁 icon), all votes are shown simultaneously — preventing anchoring bias. The average of numeric votes appears as a green circle in the team strip.</p>
+
+    <div class="mockup">
+      <div class="toolbar-mock">
+        <span class="tb-logo">♠</span>
+        <span class="tb-room">sprint-42</span>
+        <span class="tb-meta">created by Bob · 8 min ago</span>
+        <span class="tb-spacer"></span>
+        <span style="font-size:0.75rem; color:#374151; font-weight:600; margin-right:4px;">avg <strong>6.3</strong></span>
+        <div class="tb-divider"></div>
+        <span class="user-chip"><span class="avatar-circle">A</span> Alice</span>
+        <span class="conn-dot on"></span>
+      </div>
+      <div class="strip-mock">
+        <div class="card-mock revealed"><span class="corner tl">5</span>5<span class="corner br">5</span></div>
+        <div class="card-mock revealed"><span class="corner tl">5</span>5<span class="corner br">5</span></div>
+        <div class="card-mock revealed"><span class="corner tl">8</span>8<span class="corner br">8</span></div>
+        <div class="card-mock" style="border-color:#c62828; color:#c62828;">?</div>
+        <span class="strip-sep-mock"></span>
+        <div class="chip-mock">
+          <div class="chip-face" style="background:#F3F4F6; font-weight:700; font-size:1.1rem; border-color:#374151;">5</div>
+          <div class="chip-name">Alice</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face" style="background:#F3F4F6; font-weight:700; font-size:1.1rem; border-color:#374151;">5</div>
+          <div class="chip-name">Carol</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face" style="background:#F3F4F6; font-weight:700; font-size:1.1rem; border-color:#374151;">8</div>
+          <div class="chip-name">Dave</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face" style="border-color:#c62828;">?</div>
+          <div class="chip-name">Eve</div>
+        </div>
+        <div class="avg-chip-mock">
+          <div class="avg-val">6.3</div>
+          <div class="avg-lbl">avg</div>
+        </div>
+      </div>
+      <div class="mockup-caption">After reveal — values shown, non-voter highlighted in red, average circle appears. Participant view shows avg in toolbar.</div>
+    </div>
+
+    <p>Click <strong>New Round</strong> (↺ icon, replaces Reveal after cards are shown) to clear all votes and start the next story. Miss counts and the Jira link are preserved across rounds.</p>
+    <div class="tip">💡 The average ignores non-numeric votes (? and ☕) — only numbers count.</div>
   </section>
 
   <!-- Miss tracker -->
   <section id="miss">
     <h2>Deadline Miss Tracker</h2>
-    <p>When the timer expires, any participant who hasn't voted gets a miss count. A playful emoji badge appears on their card — visible to everyone in the room.</p>
-    <figure>
-      <img src="screenshots/screenshot-missbadges.png" alt="Miss badges">
-      <figcaption>Miss badges shown on cards after timer expiry. Hover for the exact count.</figcaption>
-    </figure>
+    <p>When the timer expires, any participant who hasn't voted gets their miss count incremented. A playful emoji badge appears on their chip — visible to everyone.</p>
+
+    <div class="mockup">
+      <div class="strip-mock" style="height:90px; padding-bottom:30px;">
+        <span class="strip-sep-mock" style="visibility:hidden;"></span>
+        <div class="chip-mock">
+          <div class="chip-face voted">✓</div>
+          <div class="chip-name">Alice</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face" style="position:relative;">?<span class="miss-badge">⏰</span></div>
+          <div class="chip-name">Carol</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face" style="position:relative;">?<span class="miss-badge">🐢</span></div>
+          <div class="chip-name">Dave</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face" style="position:relative;">?<span class="miss-badge">😴</span></div>
+          <div class="chip-name">Eve</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face" style="position:relative;">?<span class="miss-badge">💀</span></div>
+          <div class="chip-name">Frank</div>
+        </div>
+      </div>
+      <div class="mockup-caption">Miss badges on chips — hover each badge for the exact count tooltip.</div>
+    </div>
+
     <div class="badge-row">
       <div class="badge"><span class="emoji">⏰</span><span class="label">Missed <span class="count">1</span> deadline</span></div>
       <div class="badge"><span class="emoji">🐢</span><span class="label">Missed <span class="count">2</span> deadlines</span></div>
       <div class="badge"><span class="emoji">😴</span><span class="label">Missed <span class="count">3–4</span> deadlines</span></div>
       <div class="badge"><span class="emoji">💀</span><span class="label">Missed <span class="count">5+</span> deadlines</span></div>
     </div>
-    <p>Miss counts persist across rounds for the entire session. They only reset on server restart.</p>
+
+    <p>Miss counts persist across rounds for the entire session. They only reset on server restart. The Scrum Master is never penalised — they control the timer and are not expected to vote.</p>
   </section>
 
   <!-- Jira -->
@@ -269,53 +509,83 @@
     <h2>Jira Integration</h2>
     <p>The Scrum Master can paste a Jira issue URL into the input bar below the team strip. It is broadcast to all participants as a plain link that opens in a new tab.</p>
     <ul>
-      <li>Paste the URL and click <strong>Load</strong> (or press Enter) to share it.</li>
-      <li>Click the <strong>✕</strong> button next to the input to clear the link for everyone.</li>
-      <li>Participants see the link immediately — no page reload needed.</li>
+      <li>Paste the URL and click <strong>Load</strong> (or press Enter) to share it with the room.</li>
+      <li>Click <strong>✕</strong> next to the input to clear the link for everyone.</li>
+      <li>Participants without the SM role see the link immediately — no page reload needed.</li>
     </ul>
-    <p><em>Note: Jira Cloud blocks embedding in iframes (<code>X-Frame-Options: DENY</code>), so the issue opens in a new tab rather than inline.</em></p>
+    <div class="tip">ℹ️ Jira Cloud blocks embedding in iframes (<code>X-Frame-Options: DENY</code>), so the issue always opens in a new tab rather than inline.</div>
   </section>
 
   <!-- Scrum Master -->
   <section id="sm">
     <h2>Scrum Master Controls</h2>
-    <p>The SM has extra controls in the toolbar and the team strip.</p>
-    <h3>Toolbar</h3>
+    <p>The SM is identified in the room meta line: <em>"created by &lt;name&gt;"</em> shown next to the room name in the toolbar. The SM has additional controls not visible to regular participants.</p>
+
+    <h3>Timer controls (toolbar)</h3>
     <table>
       <tr><th>Control</th><th>Action</th></tr>
-      <tr><td>▶ Play</td><td>Start the countdown timer</td></tr>
-      <tr><td>⏸ Pause</td><td>Pause the timer</td></tr>
-      <tr><td>🔄 Reset</td><td>Reset timer to the selected duration</td></tr>
-      <tr><td>Duration dropdown</td><td>Set timer length (30 s – 5 min)</td></tr>
-      <tr><td>Reveal / New Round</td><td>Flip between estimation and discussion phases</td></tr>
+      <tr><td>▶ Play</td><td>Start the countdown</td></tr>
+      <tr><td>⏸ Pause</td><td>Pause — resume with ▶</td></tr>
+      <tr><td>↺ Reset</td><td>Reset to selected duration (only visible after timer has been touched)</td></tr>
+      <tr><td>Duration chips</td><td>Set timer length — disabled while timer is running</td></tr>
+      <tr><td>👁 Reveal</td><td>Show all votes simultaneously</td></tr>
+      <tr><td>↺ New Round</td><td>Clear votes, reset timer, start next story (replaces Reveal after cards shown)</td></tr>
     </table>
+
     <h3>Removing a participant</h3>
-    <p>Hover over any team member's card (other than your own) — it highlights red. Click to remove them from the session after confirmation. The removed user is taken back to the login screen and must rejoin manually.</p>
+    <p>Hover over any team member's chip (other than your own) — it highlights and shows a remove cursor. Click to remove them after confirmation. The removed user is returned to the login screen and must rejoin manually.</p>
+
+    <h3>Jira URL input</h3>
+    <p>An input bar below the team strip lets the SM share a Jira ticket URL with the whole room. Participants see it as a clickable link.</p>
   </section>
 
-  <!-- Roles -->
-  <section id="roles">
-    <h2>Roles</h2>
+  <!-- Presence & offline -->
+  <section id="presence">
+    <h2>Presence &amp; Offline States</h2>
+
+    <h3>Connection dot</h3>
+    <p>A small dot next to your name in the toolbar shows your WebSocket connection status:</p>
     <table>
-      <tr><th>Role</th><th>How to join</th><th>Capabilities</th></tr>
-      <tr>
-        <td><strong>Participant</strong></td>
-        <td>Leave "as scrum master" unchecked</td>
-        <td>Vote, see team strip, see timer and Jira link</td>
-      </tr>
-      <tr>
-        <td><strong>Scrum Master</strong></td>
-        <td>Check "as scrum master" — one per room</td>
-        <td>All participant actions + timer controls, reveal, new round, Jira URL, remove participants</td>
-      </tr>
+      <tr><th>Dot colour</th><th>Meaning</th></tr>
+      <tr><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#9e9e9e;"></span> Grey</td><td>Connected — everything is live</td></tr>
+      <tr><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef9a9a;"></span> Red</td><td>Reconnecting — trying to restore the connection</td></tr>
     </table>
-    <h3>Connection &amp; presence</h3>
-    <ul>
-      <li>A <strong>coloured dot</strong> next to your name shows connection status: green = connected, red = reconnecting.</li>
-      <li>If you refresh the page you reconnect automatically within seconds — your vote is preserved.</li>
-      <li>If you close the tab without logging out, you are automatically removed from the room after a <strong>30-second grace period</strong>.</li>
-      <li>Click <strong>Leave session</strong> (logout icon) to exit immediately.</li>
-    </ul>
+
+    <h3>Participant offline state</h3>
+    <p>When a teammate closes their tab or loses network, their chip is immediately <strong>dimmed</strong> and shows <em>offline</em> in red. They have a <strong>30-second grace period</strong> to reconnect before being removed from the room.</p>
+
+    <div class="mockup">
+      <div class="strip-mock">
+        <span class="strip-sep-mock" style="visibility:hidden;"></span>
+        <div class="chip-mock">
+          <div class="chip-face voted">✓</div>
+          <div class="chip-name">Alice</div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face voted offline">✓</div>
+          <div class="chip-name">Carol<span class="offline-label">offline</span></div>
+        </div>
+        <div class="chip-mock">
+          <div class="chip-face">?</div>
+          <div class="chip-name">Dave</div>
+        </div>
+      </div>
+      <div class="mockup-caption">Carol disconnected — chip dimmed, "offline" shown. If she reconnects within 30 s her vote is preserved.</div>
+    </div>
+
+    <h3>Room offline indicator</h3>
+    <p>When <em>you</em> lose connection, the room meta line in the toolbar shows <strong style="color:#c62828;">· offline</strong> in red — so you know at a glance the session is disconnected without hunting for the status dot. The full <em>"Offline — reconnecting…"</em> overlay also appears.</p>
+
+    <h3>Lifecycle summary</h3>
+    <table>
+      <tr><th>Event</th><th>Behaviour</th></tr>
+      <tr><td>Page refresh / network blip</td><td>WS closes; chip dims to "offline" instantly; reconnects automatically</td></tr>
+      <tr><td>No reconnect within 30 s</td><td>Participant removed; team strip updated for all</td></tr>
+      <tr><td>Click Leave session (logout icon)</td><td>Removed immediately; no grace period</td></tr>
+      <tr><td>SM removes you (kick)</td><td>Returned to login screen; must rejoin manually</td></tr>
+    </table>
+
+    <div class="tip">💡 If you refresh the page during a vote your selection is restored from the server — you won't lose it.</div>
   </section>
 
 </main>
