@@ -169,7 +169,14 @@
       <div class="strip-sep"></div>
 
       <!-- Team participants -->
-      <div class="team-chips">
+      <div class="team-nav">
+        @if (chipsOverflow) {
+          <button class="chips-nav-btn"
+                  (click)="scrollChips(-1)"
+                  [disabled]="chipsAtStart"
+                  matTooltip="Scroll left">‹</button>
+        }
+        <div class="team-chips" #chipsScroll (scroll)="onChipsScroll($event)">
         @for (p of participants; track p.name) {
           <div class="p-chip"
                [class.pc-voted]="p.voted"
@@ -206,7 +213,14 @@
             <span class="avg-label">avg</span>
           </div>
         }
-      </div>
+        </div><!-- /.team-chips -->
+        @if (chipsOverflow) {
+          <button class="chips-nav-btn chips-nav-btn-right"
+                  (click)="scrollChips(1)"
+                  [disabled]="chipsAtEnd"
+                  matTooltip="Scroll right">›</button>
+        }
+      </div><!-- /.team-nav -->
 
     </div>
 

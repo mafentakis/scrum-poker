@@ -398,22 +398,21 @@
 .compact-strip {
   flex-shrink: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   height: 80px;
-  padding: 0 12px 20px;
+  padding: 0 0 0 12px;
   gap: 0;
   background: #fafafa;
   border-bottom: 1px solid #e0e0e0;
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: hidden;
 }
 
 .strip-sep {
   width: 1px;
-  height: 56px;
   background: #e0e0e0;
   flex-shrink: 0;
   margin: 0 12px;
+  align-self: stretch;
 }
 
 // ── Mini poker cards ──────────────────────────────────
@@ -423,6 +422,7 @@
   gap: 7px;
   align-items: flex-end;
   flex-shrink: 0;
+  padding-bottom: 20px;
 }
 
 .mini-card {
@@ -478,13 +478,57 @@
   }
 }
 
+// ── Team nav wrapper (‹ chips ›) ─────────────────────
+
+.team-nav {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.chips-nav-btn {
+  flex-shrink: 0;
+  width: 24px;
+  border: none;
+  border-right: 1px solid #e0e0e0;
+  background: #f0f0f0;
+  color: #374151;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+
+  &:hover:not([disabled]) { background: #e0e0e0; color: #1F2937; }
+  &[disabled] { color: #d1d5db; cursor: default; }
+
+  &.chips-nav-btn-right { border-right: none; border-left: 1px solid #e0e0e0; }
+}
+
 // ── Team participants ─────────────────────────────────
 
 .team-chips {
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 0 10px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+
+  &::-webkit-scrollbar { height: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
 }
 
 .p-chip {
@@ -528,13 +572,12 @@
     transform: translateX(-50%);
     font-size: 0.68rem;
     color: #757575;
-    width: 56px;
-    white-space: normal;
-    word-break: break-word;
+    width: 44px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     text-align: center;
-    line-height: 1.25;
     display: block;
-
   }
 
   /* voted state: face stays neutral — badge signals the vote */

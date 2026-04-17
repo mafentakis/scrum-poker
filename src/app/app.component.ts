@@ -1,4 +1,4 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -99,6 +99,33 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // ── Connection ────────────────────────────────────────
   connected = false;
+
+  // ── Team chips scroll ─────────────────────────────────
+  @ViewChild('chipsScroll') chipsScrollRef!: ElementRef<HTMLElement>;
+  chipsAtStart   = true;
+  chipsAtEnd     = false;
+  chipsOverflow  = false;
+
+  scrollChips(dir: -1 | 1): void {
+    const el = this.chipsScrollRef?.nativeElement;
+    if (!el) return;
+    el.scrollBy({ left: dir * 180, behavior: 'smooth' });
+  }
+
+  onChipsScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    this.chipsAtStart  = el.scrollLeft <= 0;
+    this.chipsAtEnd    = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    this.chipsOverflow = el.scrollWidth > el.clientWidth;
+  }
+
+  private updateChipsScrollState(): void {
+    const el = this.chipsScrollRef?.nativeElement;
+    if (!el) return;
+    this.chipsAtStart  = el.scrollLeft <= 0;
+    this.chipsAtEnd    = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    this.chipsOverflow = el.scrollWidth > el.clientWidth;
+  }
 
   // ── Alert / beep state ────────────────────────────────
   nonVoterAlert    = false;
@@ -244,6 +271,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.participants  = s.participants;
     this.cardsRevealed = s.cardsRevealed;
+    setTimeout(() => this.updateChipsScrollState());
     this.missCount     = s.missCount ?? {};
     this.timerDuration = s.timerDuration;
     this.timerRemaining = s.timerRemaining;
