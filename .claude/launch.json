@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["start"],
       "port": 4200
+    },
+    {
+      "name": "Mocks",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "mocks", "--listen", "4201", "--no-clipboard"],
+      "port": 4201
     }
   ]
 }

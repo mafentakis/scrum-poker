@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vote Reward — Option 3: Floating Text</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', 'Roboto', system-ui, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 36px 24px 64px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-bottom: 40px;
+  }
+
+  /* ─── Layout ─────────────────────────────────── */
+  .layout {
+    max-width: 860px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ─── Demo panel ─────────────────────────────── */
+  .demo-panel {
+    background: #242438;
+    border-radius: 16px;
+    border: 1px solid #3a3a58;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .demo-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #7c3aed;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── App bar mockup ─────────────────────────── */
+  .app-mock {
+    background: #f5f5f5;
+    border-radius: 10px;
+    overflow: visible;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  }
+
+  /* toolbar row */
+  .mock-toolbar {
+    background: #616161;
+    border-radius: 10px 10px 0 0;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .mock-room-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.03em;
+  }
+  .mock-toolbar-spacer { flex: 1; }
+  .mock-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #81c784;
+  }
+
+  /* bottom row: cards + chips */
+  .mock-bottom {
+    display: flex;
+    align-items: stretch;
+    height: 84px;
+    position: relative;
+  }
+
+  /* cards zone */
+  .mock-cards {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    padding: 0 10px 18px;
+    flex-shrink: 0;
+    border-right: 1px solid #e0e0e0;
+    overflow: visible;
+    position: relative;
+  }
+
+  /* chips zone */
+  .mock-chips {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    padding: 0 12px 18px;
+    flex: 1;
+    overflow: visible;
+    position: relative;
+  }
+
+  /* ─── Mini Card ──────────────────────────────── */
+  .mini-card {
+    position: relative;
+    width: 34px;
+    height: 48px;
+    border-radius: 5px;
+    border: 1.5px solid #d0d0d0;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    flex-shrink: 0;
+  }
+  .mini-card .mc-val {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #bdbdbd;
+    pointer-events: none;
+  }
+  .mini-card .mc-corner {
+    position: absolute;
+    font-size: 0.45rem;
+    font-weight: 600;
+    color: #aaa;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .mini-card .mc-tl { top: 3px; left: 3px; }
+  .mini-card .mc-br { bottom: 3px; right: 3px; transform: rotate(180deg); }
+
+  .mini-card:hover:not(.mc-disabled) {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    border-color: #374151;
+  }
+  .mini-card.mc-selected {
+    background: #F3F4F6;
+    border-color: #374151;
+    box-shadow: 0 4px 12px rgba(55,65,81,0.25);
+    transform: translateY(-4px);
+  }
+  .mini-card.mc-selected .mc-val  { color: #1F2937; font-weight: 700; }
+  .mini-card.mc-selected .mc-corner { color: #1F2937; }
+  .mini-card.mc-disabled { opacity: 0.45; cursor: default; pointer-events: none; }
+
+  /* ─── Participant chip ───────────────────────── */
+  .p-chip {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .pc-face {
+    width: 34px;
+    height: 48px;
+    border-radius: 6px;
+    border: 1.5px solid #e0e0e0;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+  }
+  .pc-unknown { font-size: 1rem; color: #c0c0c0; pointer-events: none; }
+  .pc-name {
+    position: absolute;
+    top: calc(100% + 3px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    color: #9e9e9e;
+    width: 42px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    pointer-events: none;
+  }
+  .pc-me .pc-face {
+    border-color: #374151;
+    border-width: 2.5px;
+    box-shadow: 0 0 0 2px rgba(55,65,81,0.18);
+  }
+  .pc-me .pc-name { color: #374151; font-weight: 600; }
+
+  .voted-badge {
+    position: absolute;
+    bottom: -5px;
+    left: -5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #374151;
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 13px;
+    text-align: center;
+    border: 1.5px solid #f5f5f5;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  /* ─── Float text ─────────────────────────────── */
+  .float-text {
+    position: absolute;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #5c35b5;
+    text-shadow: 0 1px 4px rgba(92,53,181,0.18);
+    pointer-events: none;
+    opacity: 0;
+    white-space: nowrap;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    letter-spacing: 0.01em;
+  }
+
+  @keyframes float-up {
+    0%   { opacity: 0;   transform: translateX(-50%) translateY(10px) scale(0.65); }
+    10%  { opacity: 1;   transform: translateX(-50%) translateY(0px)  scale(1.1);  }
+    18%  { opacity: 1;   transform: translateX(-50%) translateY(-3px) scale(1.0);  }
+    55%  { opacity: 1;   transform: translateX(-50%) translateY(-10px); }
+    80%  { opacity: 0.7; transform: translateX(-50%) translateY(-22px); }
+    100% { opacity: 0;   transform: translateX(-50%) translateY(-36px) scale(0.88); }
+  }
+  .float-text.floating {
+    animation: float-up 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  }
+
+  @keyframes badge-stamp {
+    0%   { opacity: 0; transform: scale(3.5) rotate(-15deg); }
+    50%  { opacity: 1; transform: scale(0.82) rotate(4deg); }
+    70%  { transform: scale(1.1) rotate(-1deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  .voted-badge.stamping {
+    animation: badge-stamp 0.38s cubic-bezier(0.22,1,0.36,1) 0.08s both;
+  }
+
+  /* ─── Controls ───────────────────────────────── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .play-btn {
+    background: #5c35b5;
+    border: none;
+    color: white;
+    border-radius: 7px;
+    padding: 7px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .play-btn:hover  { background: #4527a0; }
+  .play-btn:active { transform: scale(0.96); }
+
+  .random-btn {
+    background: transparent;
+    border: 1px solid #3a3a58;
+    color: #9ca3af;
+    border-radius: 7px;
+    padding: 7px 14px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .random-btn:hover { border-color: #6d5acd; color: #c4b5fd; }
+
+  .current-msg {
+    flex: 1;
+    min-width: 140px;
+    font-size: 0.78rem;
+    color: #c4b5fd;
+    font-weight: 600;
+    font-style: italic;
+    text-align: right;
+  }
+
+  /* ─── Sentences panel ────────────────────────── */
+  .sentences-panel {
+    background: #1e1e32;
+    border-radius: 14px;
+    border: 1px solid #2e2e4a;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 520px;
+  }
+  .sp-header {
+    padding: 14px 16px 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid #2e2e4a;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sp-count {
+    background: rgba(92,53,181,0.2);
+    color: #a78bfa;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .sp-list {
+    overflow-y: auto;
+    padding: 8px 0;
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a58 transparent;
+  }
+  .sp-list::-webkit-scrollbar { width: 4px; }
+  .sp-list::-webkit-scrollbar-thumb { background: #3a3a58; border-radius: 4px; }
+  .sp-item {
+    padding: 5px 16px;
+    font-size: 0.74rem;
+    color: #9ca3af;
+    line-height: 1.4;
+    transition: background 0.1s, color 0.1s;
+    border-radius: 4px;
+    margin: 0 4px;
+    cursor: default;
+  }
+  .sp-item:hover  { background: rgba(92,53,181,0.12); color: #d1d5db; }
+  .sp-item.active { background: rgba(92,53,181,0.22); color: #c4b5fd; font-weight: 600; }
+
+  /* ─── Stats bar ──────────────────────────────── */
+  .stats {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 8px 0 0;
+  }
+  .stat {
+    font-size: 0.7rem;
+    color: #6b7280;
+  }
+  .stat strong { color: #a78bfa; }
+
+  @media (max-width: 680px) {
+    .layout { grid-template-columns: 1fr; }
+    .sentences-panel { max-height: 280px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Vote Reward — Floating Text</h1>
+<p class="subtitle">Click any card to trigger · random message from 100 curated sentences</p>
+
+<div class="layout">
+
+  <!-- ─── Demo panel ──────────────────────────── -->
+  <div class="demo-panel">
+    <span class="demo-label">Live Demo — Click a card to vote</span>
+
+    <!-- App bar mockup -->
+    <div class="app-mock">
+      <div class="mock-toolbar">
+        <span class="mock-room-name">Sprint 42 · Story #7</span>
+        <span class="mock-toolbar-spacer"></span>
+        <span class="mock-dot"></span>
+      </div>
+      <div class="mock-bottom">
+
+        <!-- Cards zone -->
+        <div class="mock-cards" id="cards-zone">
+          <div class="mini-card" data-val="1"  onclick="vote(this)"><span class="mc-corner mc-tl">1</span><span class="mc-val">1</span><span class="mc-corner mc-br">1</span></div>
+          <div class="mini-card" data-val="2"  onclick="vote(this)"><span class="mc-corner mc-tl">2</span><span class="mc-val">2</span><span class="mc-corner mc-br">2</span></div>
+          <div class="mini-card" data-val="3"  onclick="vote(this)"><span class="mc-corner mc-tl">3</span><span class="mc-val">3</span><span class="mc-corner mc-br">3</span></div>
+          <div class="mini-card" data-val="5"  onclick="vote(this)"><span class="mc-corner mc-tl">5</span><span class="mc-val">5</span><span class="mc-corner mc-br">5</span></div>
+          <div class="mini-card" data-val="8"  onclick="vote(this)"><span class="mc-corner mc-tl">8</span><span class="mc-val">8</span><span class="mc-corner mc-br">8</span></div>
+          <div class="mini-card" data-val="13" onclick="vote(this)"><span class="mc-corner mc-tl">13</span><span class="mc-val" style="font-size:0.75rem">13</span><span class="mc-corner mc-br">13</span></div>
+        </div>
+
+        <!-- Chips zone -->
+        <div class="mock-chips" id="chips-zone">
+          <!-- "you" chip -->
+          <div class="p-chip pc-me" id="my-chip">
+            <div class="pc-face">
+              <span class="pc-unknown" id="my-unknown">?</span>
+            </div>
+            <span class="voted-badge" id="my-badge">✓</span>
+            <span class="pc-name">You</span>
+            <div class="float-text" id="my-float"></div>
+          </div>
+          <!-- team chips -->
+          <div class="p-chip"><div class="pc-face pc-voted-static"><span class="pc-unknown" style="color:#bbb">?</span></div><span class="pc-name">Alex</span></div>
+          <div class="p-chip"><div class="pc-face"><span class="pc-unknown">?</span></div><span class="pc-name">Sam</span></div>
+          <div class="p-chip"><div class="pc-face"><span class="pc-unknown">?</span></div><span class="pc-name">Jordan</span></div>
+        </div>
+
+      </div><!-- /mock-bottom -->
+    </div><!-- /app-mock -->
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="play-btn" onclick="fireRandom()">▶ Fire random</button>
+      <button class="random-btn" onclick="resetVote()">↺ Reset</button>
+      <span class="current-msg" id="current-msg">—</span>
+    </div>
+
+    <div class="stats">
+      <span class="stat">Fires so far: <strong id="fire-count">0</strong></span>
+      <span class="stat">Duration: <strong>2.6 s</strong></span>
+      <span class="stat">Pool: <strong>100</strong> sentences</span>
+    </div>
+  </div>
+
+  <!-- ─── Sentences panel ──────────────────────── -->
+  <div class="sentences-panel">
+    <div class="sp-header">
+      <span>Sentence pool</span>
+      <span class="sp-count">100</span>
+    </div>
+    <div class="sp-list" id="sp-list"></div>
+  </div>
+
+</div><!-- /layout -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 100 MOTIVATIONAL COMPACT SENTENCES
+// ═══════════════════════════════════════════════════════
+const SENTENCES = [
+  // Confidence & decisiveness
+  "Sharp call! 🎯",
+  "No hesitation! ⚡",
+  "Decisive! 💪",
+  "Committed! 📌",
+  "Mind made up! 🧠",
+  "Conviction! ✊",
+  "Calibrated! ⚖️",
+  "Gut trusted! 🦊",
+  "Bold take! 🔥",
+  "Locked in! 🔐",
+
+  // Planning poker / fibonacci
+  "Cards don't lie! 🃏",
+  "Bet placed! 🎲",
+  "Poker face! 😎",
+  "Point dropped! 📍",
+  "Ante up! 🃏",
+  "Hand played! ♠️",
+  "All in! 🎰",
+  "Fibonacci moment! ✨",
+  "Planning poker pro! 🏆",
+  "Sequence mastered! 🌀",
+
+  // Sprint / scrum
+  "Sprint fuel! ⛽",
+  "Story sized! 📏",
+  "Sprint hero! 🦸",
+  "Velocity rising! 📈",
+  "Story tamed! 🦁",
+  "Definition clear! 📋",
+  "Complexity felt! 💪",
+  "Story mapped! 🗺️",
+  "Scope defined! 🔭",
+  "Ready to ship! 🚀",
+
+  // Short punchy wins
+  "Nice one! 🌟",
+  "Solid! 🪨",
+  "Perfect! ✅",
+  "Outstanding! 🌠",
+  "Excellent! 🥇",
+  "Nailed it! 🔨",
+  "On point! 🎯",
+  "Brilliant! 💡",
+  "Smooth! 🏄",
+  "Flawless! 💎",
+
+  // Funny / personality
+  "Big brain activated! 🧠",
+  "Galaxy brain! 🌌",
+  "Engineering vibes! 🔧",
+  "Pure science! 🔬",
+  "Magic numbers! 🪄",
+  "Estimates fly! 🦋",
+  "Chaos contained! 🌀",
+  "Dragon slain! 🐉",
+  "Complexity? Crushed! 💥",
+  "Easy money! 💰",
+
+  // Team / collaboration
+  "Team player! 🤝",
+  "Voice heard! 📣",
+  "Data point in! 📊",
+  "Opinion matters! 💬",
+  "Contributing! 🏗️",
+  "Building consensus! 🤝",
+  "One step closer! 👣",
+  "Stronger together! 🫂",
+  "Alignment unlocked! 🔗",
+  "Sprint shines! ☀️",
+
+  // Ultra short bangers
+  "Boom! 💥",
+  "Bam! ✨",
+  "Yes! 🎉",
+  "Done! ✔️",
+  "Voted! 🗳️",
+  "Locked! 🔒",
+  "Stamped! 📮",
+  "Counted! 🧮",
+  "Registered! 📝",
+  "Noted! 🫡",
+
+  // Motivational depth
+  "Trust the process! 🔄",
+  "Gut check done! ✔️",
+  "Instinct activated! ⚡",
+  "Experience counts! 🧓",
+  "Wisdom shared! 🦉",
+  "Thinking done! 💭",
+  "Nuance captured! 🎨",
+  "Effort estimated! ⏱️",
+  "Work understood! 📚",
+  "Knowledge applied! 🎓",
+
+  // Playful / nerdy
+  "Fibonacci approved! 🌀",
+  "Points secured! 🔒",
+  "Sprint unlocked! 🔑",
+  "Async aligned! 🔗",
+  "No anchoring bias! ⚓",
+  "Independent view! 👁️",
+  "True estimate! 🏹",
+  "Pure instinct! 🐺",
+  "Unbiased call! 🌱",
+  "Raw feeling! 🎸",
+
+  // Closing hits
+  "Sprint starts now! 🏁",
+  "Story lives! 📖",
+  "Progress made! ⬆️",
+  "MVP energy! ⭐",
+  "That's planning! 📅",
+  "History written! 📜",
+  "Future shaped! 🔮",
+  "Courage shown! 🦁",
+  "Risk assessed! 🛡️",
+  "Value delivered! 🎁",
+];
+
+// ═══════════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════════
+let fireCount  = 0;
+let activeIdx  = -1;
+let floatTimer = null;
+let lastIdx    = -1;
+
+// ─── Build sentences list ─────────────────────────────
+const spList = document.getElementById('sp-list');
+SENTENCES.forEach((s, i) => {
+  const div = document.createElement('div');
+  div.className = 'sp-item';
+  div.id = 'sp-' + i;
+  div.textContent = (i + 1) + '. ' + s;
+  spList.appendChild(div);
+});
+
+// ─── Pick random (no repeat) ─────────────────────────
+function pickRandom() {
+  let idx;
+  do { idx = Math.floor(Math.random() * SENTENCES.length); }
+  while (idx === lastIdx && SENTENCES.length > 1);
+  lastIdx = idx;
+  return idx;
+}
+
+// ─── Fire animation ───────────────────────────────────
+function fire(sentence, sentenceIdx) {
+  const floatEl = document.getElementById('my-float');
+  const badge   = document.getElementById('my-badge');
+  const msgEl   = document.getElementById('current-msg');
+
+  // Clear previous
+  floatEl.classList.remove('floating');
+  badge.classList.remove('stamping');
+  if (floatTimer) clearTimeout(floatTimer);
+
+  // Highlight sentence in list
+  if (activeIdx >= 0) document.getElementById('sp-' + activeIdx)?.classList.remove('active');
+  activeIdx = sentenceIdx;
+  const spItem = document.getElementById('sp-' + activeIdx);
+  spItem?.classList.add('active');
+  spItem?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  // Update current message display
+  msgEl.textContent = '"' + sentence + '"';
+
+  // Reflow & animate
+  void floatEl.offsetWidth;
+  floatEl.textContent = sentence;
+  floatEl.classList.add('floating');
+  badge.classList.add('stamping');
+
+  // Update counter
+  fireCount++;
+  document.getElementById('fire-count').textContent = fireCount;
+
+  // Cleanup after animation
+  floatTimer = setTimeout(() => {
+    floatEl.classList.remove('floating');
+    spItem?.classList.remove('active');
+    activeIdx = -1;
+  }, 3000);
+}
+
+// ─── Vote: click a card ───────────────────────────────
+function vote(cardEl) {
+  // Deselect all
+  document.querySelectorAll('.mini-card').forEach(c => c.classList.remove('mc-selected'));
+  cardEl.classList.add('mc-selected');
+
+  const idx = pickRandom();
+  fire(SENTENCES[idx], idx);
+}
+
+// ─── Fire random (button) ─────────────────────────────
+function fireRandom() {
+  const idx = pickRandom();
+  fire(SENTENCES[idx], idx);
+}
+
+// ─── Reset ────────────────────────────────────────────
+function resetVote() {
+  document.querySelectorAll('.mini-card').forEach(c => c.classList.remove('mc-selected'));
+  const floatEl = document.getElementById('my-float');
+  const badge   = document.getElementById('my-badge');
+  floatEl.classList.remove('floating');
+  badge.classList.remove('stamping');
+  if (activeIdx >= 0) document.getElementById('sp-' + activeIdx)?.classList.remove('active');
+  activeIdx = -1;
+  document.getElementById('current-msg').textContent = '—';
+}
+</script>
+</body>
+</html>

@@ -33,6 +33,43 @@ interface ServerState {
   createdAt: number;
 }
 
+const VOTE_MESSAGES = [
+  'Sharp call! 🎯',       'No hesitation! ⚡',     'Decisive! 💪',
+  'Committed! 📌',        'Mind made up! 🧠',       'Conviction! ✊',
+  'Calibrated! ⚖️',       'Gut trusted! 🦊',        'Bold take! 🔥',
+  'Locked in! 🔐',        "Cards don't lie! 🃏",    'Bet placed! 🎲',
+  'Poker face! 😎',       'Point dropped! 📍',      'Ante up! 🃏',
+  'Hand played! ♠️',      'All in! 🎰',             'Fibonacci moment! ✨',
+  'Planning poker pro! 🏆','Sequence mastered! 🌀', 'Sprint fuel! ⛽',
+  'Story sized! 📏',      'Sprint hero! 🦸',        'Velocity rising! 📈',
+  'Story tamed! 🦁',      'Definition clear! 📋',   'Complexity felt! 💪',
+  'Story mapped! 🗺️',     'Scope defined! 🔭',      'Ready to ship! 🚀',
+  'Nice one! 🌟',         'Solid! 🪨',              'Perfect! ✅',
+  'Outstanding! 🌠',      'Excellent! 🥇',          'Nailed it! 🔨',
+  'On point! 🎯',         'Brilliant! 💡',          'Smooth! 🏄',
+  'Flawless! 💎',         'Big brain activated! 🧠','Galaxy brain! 🌌',
+  'Engineering vibes! 🔧','Pure science! 🔬',       'Magic numbers! 🪄',
+  'Estimates fly! 🦋',    'Chaos contained! 🌀',    'Dragon slain! 🐉',
+  'Complexity? Crushed! 💥','Easy money! 💰',        'Team player! 🤝',
+  'Voice heard! 📣',      'Data point in! 📊',      'Opinion matters! 💬',
+  'Contributing! 🏗️',     'Building consensus! 🤝', 'One step closer! 👣',
+  'Stronger together! 🫂','Alignment unlocked! 🔗', 'Sprint shines! ☀️',
+  'Boom! 💥',             'Bam! ✨',                'Yes! 🎉',
+  'Done! ✔️',             'Voted! 🗳️',             'Locked! 🔒',
+  'Stamped! 📮',          'Counted! 🧮',            'Registered! 📝',
+  'Noted! 🫡',            'Trust the process! 🔄',  'Gut check done! ✔️',
+  'Instinct activated! ⚡','Experience counts! 🧓',  'Wisdom shared! 🦉',
+  'Thinking done! 💭',    'Nuance captured! 🎨',    'Effort estimated! ⏱️',
+  'Work understood! 📚',  'Knowledge applied! 🎓',  'Fibonacci approved! 🌀',
+  'Points secured! 🔒',   'Sprint unlocked! 🔑',    'Async aligned! 🔗',
+  'No anchoring bias! ⚓', 'Independent view! 👁️',  'True estimate! 🏹',
+  'Pure instinct! 🐺',    'Unbiased call! 🌱',      'Raw feeling! 🎸',
+  'Sprint starts now! 🏁','Story lives! 📖',        'Progress made! ⬆️',
+  'MVP energy! ⭐',        "That's planning! 📅",    'History written! 📜',
+  'Future shaped! 🔮',    'Courage shown! 🦁',      'Risk assessed! 🛡️',
+  'Value delivered! 🎁',
+];
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -96,6 +133,12 @@ export class AppComponent implements OnInit, OnDestroy {
   // ── Jira ──────────────────────────────────────────────
   jiraUrl    = '';
   jiraLoaded = false;
+
+  // ── Vote reward float ─────────────────────────────────
+  voteFloatMsg    = '';
+  voteFloatActive = false;
+  private lastVoteFloatIdx = -1;
+  private voteFloatTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ── Connection ────────────────────────────────────────
   connected = false;
@@ -393,7 +436,25 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.selectedCard = value;        // optimistic select
       this.send({ type: 'vote', value });
+      this.fireVoteFloat();
     }
+  }
+
+  private fireVoteFloat(): void {
+    let idx: number;
+    do { idx = Math.floor(Math.random() * VOTE_MESSAGES.length); }
+    while (idx === this.lastVoteFloatIdx && VOTE_MESSAGES.length > 1);
+    this.lastVoteFloatIdx = idx;
+
+    if (this.voteFloatTimer) clearTimeout(this.voteFloatTimer);
+    this.voteFloatActive = false;
+    this.voteFloatMsg    = VOTE_MESSAGES[idx];
+
+    // Destroy + recreate the element so the CSS animation always restarts fresh
+    setTimeout(() => {
+      this.voteFloatActive = true;
+      this.voteFloatTimer  = setTimeout(() => { this.voteFloatActive = false; }, 3000);
+    }, 0);
   }
 
   kickParticipant(name: string): void {
