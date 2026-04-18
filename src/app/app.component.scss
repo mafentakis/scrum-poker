@@ -807,3 +807,64 @@
   .mat-mdc-snack-bar-label { color: white; }
   .mat-mdc-button { color: #ffcdd2 !important; }
 }
+
+// ═══════════════════════════════════════════════════════
+// RESPONSIVE — Option B: PWA Scaling (phone < 480px)
+// ═══════════════════════════════════════════════════════
+
+@media (max-width: 480px) {
+
+  // ── Registration bar: wrap inputs into two rows ──────
+  .register-bar {
+    height: auto;
+    min-height: 160px;
+  }
+
+  .reg-inputs {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    padding: 8px 12px;
+    align-items: center;
+    align-content: center;
+  }
+
+  .reg-input {
+    width: auto;
+    flex: 1 1 100px;
+    min-width: 0;
+  }
+
+  // ── App shell compact: 160px on phone ───────────────
+  .app-shell {
+    height: 160px;
+  }
+
+  // ── Compact strip: taller to give cards room ─────────
+  .compact-strip {
+    height: 120px;
+  }
+
+  // ── Cards + chips: fluid width via clamp ─────────────
+  .mini-card {
+    width: clamp(30px, 8vw, 38px);
+    height: clamp(42px, 11vw, 52px);
+
+    .mc-val { font-size: 0.85rem; }
+  }
+
+  .p-chip .pc-face {
+    width: clamp(30px, 8vw, 38px) !important;
+    height: clamp(42px, 11vw, 52px) !important;
+  }
+
+  // ── Hide timer + duration chips in compact toolbar ───
+  .timer-widget,
+  .duration-chips {
+    display: none !important;
+  }
+
+  // ── Hide secondary room meta text ────────────────────
+  .room-meta {
+    display: none;
+  }
+}

@@ -118,7 +118,9 @@ export class AppComponent implements OnInit, OnDestroy {
   registerError = '';
 
   // ── Layout ────────────────────────────────────────────
-  private readonly COMPACT_H = 120;
+  private get COMPACT_H(): number {
+    return window.innerWidth < 480 ? 160 : 120;
+  }
   private _isExpanded = false;
 
   get isExpanded(): boolean { return this._isExpanded; }
