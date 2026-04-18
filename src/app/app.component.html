@@ -203,9 +203,6 @@
             @if (p.voted && !cardsRevealed) {
               <span class="voted-badge">✓</span>
             }
-            @if (p.name === userName && voteFloatActive) {
-              <span class="vote-float">{{ voteFloatMsg }}</span>
-            }
             <span class="pc-name">{{ p.name }}</span>
           </div>
         }
@@ -217,6 +214,7 @@
           </div>
         }
         </div><!-- /.team-chips -->
+        <span class="vote-float" #voteFloat>{{ voteFloatMsg }}</span>
         @if (chipsOverflow) {
           <button class="chips-nav-btn chips-nav-btn-right"
                   (click)="scrollChips(1)"

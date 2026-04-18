@@ -135,8 +135,7 @@ export class AppComponent implements OnInit, OnDestroy {
   jiraLoaded = false;
 
   // ── Vote reward float ─────────────────────────────────
-  voteFloatMsg    = '';
-  voteFloatActive = false;
+  voteFloatMsg = '';
   private lastVoteFloatIdx = -1;
   private voteFloatTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -145,6 +144,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // ── Team chips scroll ─────────────────────────────────
   @ViewChild('chipsScroll') chipsScrollRef!: ElementRef<HTMLElement>;
+  @ViewChild('voteFloat')  private voteFloatRef?: ElementRef<HTMLElement>;
   chipsAtStart   = true;
   chipsAtEnd     = false;
   chipsOverflow  = false;
@@ -446,15 +446,36 @@ export class AppComponent implements OnInit, OnDestroy {
     do { idx = Math.floor(Math.random() * VOTE_MESSAGES.length); }
     while (idx === this.lastVoteFloatIdx && VOTE_MESSAGES.length > 1);
     this.lastVoteFloatIdx = idx;
+    this.voteFloatMsg = VOTE_MESSAGES[idx];
 
     if (this.voteFloatTimer) clearTimeout(this.voteFloatTimer);
-    this.voteFloatActive = false;
-    this.voteFloatMsg    = VOTE_MESSAGES[idx];
 
-    // Destroy + recreate the element so the CSS animation always restarts fresh
+    // Wait for Angular to render the new message text, then position + animate
     setTimeout(() => {
-      this.voteFloatActive = true;
-      this.voteFloatTimer  = setTimeout(() => { this.voteFloatActive = false; }, 3000);
+      const floatEl = this.voteFloatRef?.nativeElement;
+      const chipsEl = this.chipsScrollRef?.nativeElement;
+      if (!floatEl || !chipsEl) return;
+
+      // Find current user's chip (marked with pc-me)
+      const myChipEl = chipsEl.querySelector('.pc-me') as HTMLElement | null;
+      if (!myChipEl) return;
+
+      // Position float centred above the chip, relative to .team-nav (offsetParent)
+      const chipRect = myChipEl.getBoundingClientRect();
+      const navEl    = floatEl.offsetParent as HTMLElement;
+      const navRect  = navEl.getBoundingClientRect();
+
+      floatEl.style.left   = `${chipRect.left - navRect.left + chipRect.width / 2}px`;
+      floatEl.style.bottom = `${navRect.bottom - chipRect.top + 8}px`;
+
+      // Restart animation: remove class → reflow → add class
+      floatEl.classList.remove('vf-run');
+      void floatEl.offsetWidth;   // force reflow so animation starts from frame 0
+      floatEl.classList.add('vf-run');
+
+      this.voteFloatTimer = setTimeout(() => {
+        floatEl.classList.remove('vf-run');
+      }, 2700);
     }, 0);
   }
 
