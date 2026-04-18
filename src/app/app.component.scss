@@ -836,16 +836,74 @@
 
   // ── App shell compact: 160px on phone ───────────────
   .app-shell {
-    height: 160px;
+    height: 208px;
   }
 
   // ── Compact strip: taller to give cards room ─────────
   .compact-strip {
-    height: 120px;
+    height: 168px;
+    padding: 0;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .strip-sep {
+    order: 2;
+    width: auto;
+    height: 1px;
+    margin: 0 12px;
+    align-self: auto;
+  }
+
+  .team-nav {
+    order: 1;
+    flex: 0 0 82px;
+    min-width: 0;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .team-chips {
+    align-items: center;
+    height: 100%;
+    padding: 0 12px;
+    box-sizing: border-box;
+  }
+
+  .chips-nav-btn {
+    display: none;
+  }
+
+  .mini-cards {
+    order: 3;
+    flex: 0 0 84px;
+    min-width: 0;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 12px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+
+    &::-webkit-scrollbar { height: 4px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+  }
+
+  .p-chip {
+    padding-bottom: 18px;
+  }
+
+  .p-chip .pc-name {
+    top: auto;
+    bottom: 0;
+    margin-top: 0;
   }
 
   // ── Cards + chips: fluid width via clamp ─────────────
   .mini-card {
+    flex: 0 0 auto;
     width: clamp(30px, 8vw, 38px);
     height: clamp(42px, 11vw, 52px);
 

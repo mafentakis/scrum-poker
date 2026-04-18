@@ -321,11 +321,15 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As a user**, the app runs in a fixed **120 px compact strip** that sits above any other window — so it stays visible while the team is in a Zoom call or Jira.
 - **As a user**, I can install the app as a PWA and it runs in a fixed 120 px window — the expand/collapse toggle was removed for simplicity.
 - **As a user**, I can install the app as a PWA from Chrome's address bar — so it opens as a standalone window without browser chrome.
+- **As a user on a phone in portrait orientation**, the compact area reflows into **two rows** — participants on the first row, my voting cards on the second — so teammates stay visible while voting remains one swipe away.
+- **As a user on a phone in portrait orientation**, both mobile rows keep their contents **vertically centered** within the available row height — including the participant name label — so the layout feels balanced instead of top- or bottom-heavy.
+- **As a user on a phone in portrait orientation**, participant chips and voting cards stay **left-aligned horizontally** and can scroll sideways when they overflow — so the first visible items remain predictable and easy to reach with the thumb.
 - **As a user**, a monochrome dot in the toolbar shows my WebSocket connection status (grey = connected, red = reconnecting) — so I know if I'm live without a distracting green light at rest.
 - **As a user**, when I lose internet I see a clear "Offline — reconnecting…" overlay rather than a frozen screen — so I know the app is trying to reconnect.
 - **As a user**, when I'm offline the room meta line shows "· offline" in red — so I can tell at a glance the session is disconnected without needing to find the status dot.
 - **As any participant**, when a teammate disconnects, their entire chip fades to 40% opacity — no text label, "offline" shown as a tooltip on hover — so the team knows they are temporarily away without cluttering the strip.
-- **As any participant**, ‹ › scroll buttons appear on the team strip only when there are enough participants to overflow — so small teams see a clean strip with no extra chrome, and large teams can navigate without horizontal swiping.
+- **As any participant** on desktop and larger screens, ‹ › scroll buttons appear on the team strip only when there are enough participants to overflow — so small teams see a clean strip with no extra chrome, and large teams can navigate without horizontal swiping.
+- **As any participant** on phones, horizontal overflow is handled by direct swipe scrolling rather than dedicated ‹ › buttons — so the compact layout avoids extra controls in the narrow viewport.
 
 ### Timer
 
