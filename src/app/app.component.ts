@@ -223,7 +223,8 @@ export class AppComponent implements OnInit, OnDestroy {
   // ── WebSocket ─────────────────────────────────────────
 
   private connectWS(): void {
-    const url = `ws://${location.host}/ws`;
+    const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+    const url = `${protocol}://${location.host}/ws`;
     const ws  = new WebSocket(url);
     this.ws   = ws;
 
