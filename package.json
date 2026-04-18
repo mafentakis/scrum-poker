@@ -21,6 +21,7 @@
     "@angular/router": "^17.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "ws": "^8.17.0",
     "zone.js": "~0.14.0"
   },
   "devDependencies": {
@@ -28,7 +29,6 @@
     "@angular/cli": "^17.3.0",
     "@angular/compiler-cli": "^17.3.0",
     "concurrently": "^8.2.0",
-    "typescript": "~5.4.0",
-    "ws": "^8.17.0"
+    "typescript": "~5.4.0"
   }
 }

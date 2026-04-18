@@ -1,7 +1,25 @@
 'use strict';
 
 const http = require('http');
+const fs   = require('fs');
+const path = require('path');
 const { WebSocketServer } = require('ws');
+
+const STATIC_DIR = path.join(__dirname, 'dist', 'scrum-poker', 'browser');
+
+const MIME_TYPES = {
+  '.html':        'text/html; charset=utf-8',
+  '.js':          'text/javascript',
+  '.css':         'text/css',
+  '.json':        'application/json',
+  '.webmanifest': 'application/manifest+json',
+  '.svg':         'image/svg+xml',
+  '.ico':         'image/x-icon',
+  '.png':         'image/png',
+  '.woff2':       'font/woff2',
+  '.woff':        'font/woff',
+  '.ttf':         'font/ttf',
+};
 
 // ── Room store ─────────────────────────────────────────
 // rooms: Map<roomName, RoomState>
@@ -138,14 +156,56 @@ function stopTimer(room) {
 
 // ── HTTP + WebSocket server ────────────────────────────
 
-const server = http.createServer((_req, res) => {
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  const summary = [...rooms.entries()].map(([n, r]) => ({
-    room: n,
-    participants: r.participants.length,
-    lastActivity: new Date(r.lastActivity).toISOString(),
-  }));
-  res.end(JSON.stringify({ rooms: summary }));
+const server = http.createServer((req, res) => {
+  const urlPath = (req.url || '/').split('?')[0];
+
+  // API: room summary
+  if (urlPath === '/api/rooms') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    const summary = [...rooms.entries()].map(([n, r]) => ({
+      room: n,
+      participants: r.participants.length,
+      lastActivity: new Date(r.lastActivity).toISOString(),
+    }));
+    res.end(JSON.stringify({ rooms: summary }));
+    return;
+  }
+
+  // Static file serving (Angular SPA)
+  const safePath = path.normalize(urlPath).replace(/^(\.\.(\/|\\|$))+/, '');
+  const filePath = path.join(STATIC_DIR, safePath === '/' ? 'index.html' : safePath);
+
+  // Path traversal guard
+  if (!filePath.startsWith(STATIC_DIR + path.sep) && filePath !== path.join(STATIC_DIR, 'index.html')) {
+    res.writeHead(403);
+    res.end();
+    return;
+  }
+
+  const serveIndex = () => {
+    const indexPath = path.join(STATIC_DIR, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      fs.createReadStream(indexPath).pipe(res);
+    } else {
+      // Fallback when static files not built (dev mode)
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      const summary = [...rooms.entries()].map(([n, r]) => ({
+        room: n, participants: r.participants.length,
+        lastActivity: new Date(r.lastActivity).toISOString(),
+      }));
+      res.end(JSON.stringify({ rooms: summary }));
+    }
+  };
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    const ext  = path.extname(filePath).toLowerCase();
+    const mime = MIME_TYPES[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': mime });
+    fs.createReadStream(filePath).pipe(res);
+  } else {
+    serveIndex();
+  }
 });
 
 const wss = new WebSocketServer({ server, path: '/ws' });

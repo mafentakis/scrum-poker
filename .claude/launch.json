@@ -13,5 +13,11 @@
       "runtimeArgs": ["serve", "mocks", "--listen", "4201", "--no-clipboard"],
       "port": 4201
     }
+  ,{
+      "name": "Docker",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["run", "--rm", "-p", "3456:3000", "--name", "scrum-poker-preview", "scrum-pocker-scrum-poker"],
+      "port": 3456
+    }
   ]
 }
