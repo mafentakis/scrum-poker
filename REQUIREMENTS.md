@@ -93,7 +93,7 @@ Role is self-selected at registration (no authentication required).
 ## Team Strip
 
 - Compact horizontal row, always visible (~80 px height).
-- Strip is scrollable horizontally. **‹ › navigation buttons** appear flanking the strip only when chips overflow (hidden for small teams). Buttons stretch full strip height; `‹` is disabled at the left edge, `›` at the right edge. A thin scrollbar is always visible inside the chips area.
+- Participant navigation is responsive by input mode: **desktop / laptop layouts** use dedicated **‹ ›** buttons when the strip overflows, while **phones and tablets** use **swipe only**. Scrollbars are hidden in both cases.
 - Participant names are **truncated with `…`** if they exceed the chip width (44 px). Full name is always readable via the chip's tooltip on hover.
 - Each participant chip uses **two independent visual signals**:
   - **Voted badge**: charcoal `#374151` circle (bottom-left corner, 16 px) with a `✓` — present when voted, absent when not. Hidden after reveal (value is sufficient).
@@ -133,7 +133,7 @@ Role is self-selected at registration (no authentication required).
 
 ## Layout & Sizing
 
-### Layout (single fixed mode)
+### Desktop Compact Layout
 ```
 ┌───────────────────────────────────────────────────────────────┐
 │  Progress bar  (4 px)                                         │
@@ -145,7 +145,27 @@ Role is self-selected at registration (no authentication required).
 Total height: 120 px  (fixed, resize-locked in standalone PWA)
 ```
 
-> Note: expand/collapse mode was removed. The Jira URL input and link are always visible below the strip when the window is taller.
+> Note: this fixed `120 px` compact strip is the canonical **desktop / laptop** layout. It is not a hard height constraint for narrow touch devices.
+
+### Responsive Rules
+
+#### Desktop / Laptop
+
+- Applies to desktops and laptops, including touchscreen laptops.
+- Layout stays **120 px** tall and uses a **single row** with **cards first** and **participants second**.
+- Participant overflow is handled with dedicated **‹ ›** buttons only; **no visible scrollbar**.
+
+#### Phones / Tablets
+
+- Touch devices use **swipe-only** participant navigation with **no visible scrollbar**.
+- Below **`600 px` width**, the compact area reflows into **two rows**: **participants first**, **cards second**.
+- At **`600 px` width and above**, the compact area stays **single-row** with **cards first** and **participants second**, including portrait tablets.
+- On narrow touch layouts, the shell may grow **taller than `120 px`** to preserve usable touch targets and vertical centering.
+- The toolbar stays a **single 36 px row**; secondary actions (**Leave**, **Share**, **Help**) move into one overflow menu.
+
+#### Shared
+
+- My own participant chip remains **first** in the strip across all breakpoints and input modes.
 
 ---
 
@@ -318,18 +338,29 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 
 ### Layout & PWA
 
-- **As a user**, the app runs in a fixed **120 px compact strip** that sits above any other window — so it stays visible while the team is in a Zoom call or Jira.
-- **As a user**, I can install the app as a PWA and it runs in a fixed 120 px window — the expand/collapse toggle was removed for simplicity.
+#### Desktop / Laptop
+
+- **As a user on desktop or laptop**, the app runs in a fixed **120 px compact strip** that sits above any other window — so it stays visible while the team is in a Zoom call or Jira.
+- **As a user on desktop or laptop**, the compact strip stays **single-row** with **cards first** and **participants second** — so the layout remains dense and familiar on larger screens.
+- **As a user on desktop or laptop**, when the participant strip overflows, I navigate it only with dedicated **‹ ›** buttons, with **no visible scrollbar** — so the interaction stays explicit and precise without extra chrome.
+
+#### Phones / Tablets
+
+- **As a user on a phone or tablet**, participant chips are navigated by **swipe only** and show **no visible scrollbar** — so touch layouts stay direct and uncluttered.
+- **As a user on a narrow touch device (`< 600 px`)**, the compact area reflows into **two vertically centered rows** — participants first, cards second — so teammates stay visible while voting remains one swipe away.
+- **As a user on a narrow touch device (`< 600 px`)**, the participant row stays **left-aligned** when all chips fit — so the row starts from a predictable anchor.
+- **As a user on a touch device at `600 px` width or above**, the compact area stays **single-row** with **cards first** and **participants second** — so wider touch screens preserve density without reverting to desktop overflow controls.
+- **As a user on a phone or tablet**, the toolbar stays a **single 36 px row**, and secondary actions move into one overflow menu — so the primary context stays visible without wrapping or horizontal toolbar scrolling.
+
+#### Shared
+
+- **As a user**, I can install the app as a PWA, and the desktop / laptop compact mode remains a fixed 120 px window — the expand/collapse toggle was removed for simplicity.
 - **As a user**, I can install the app as a PWA from Chrome's address bar — so it opens as a standalone window without browser chrome.
-- **As a user on a phone in portrait orientation**, the compact area reflows into **two rows** — participants on the first row, my voting cards on the second — so teammates stay visible while voting remains one swipe away.
-- **As a user on a phone in portrait orientation**, both mobile rows keep their contents **vertically centered** within the available row height — including the participant name label — so the layout feels balanced instead of top- or bottom-heavy.
-- **As a user on a phone in portrait orientation**, participant chips and voting cards stay **left-aligned horizontally** and can scroll sideways when they overflow — so the first visible items remain predictable and easy to reach with the thumb.
+- **As a participant**, my own chip is always rendered **first** in the participant strip — so I can find myself instantly regardless of room size.
 - **As a user**, a monochrome dot in the toolbar shows my WebSocket connection status (grey = connected, red = reconnecting) — so I know if I'm live without a distracting green light at rest.
 - **As a user**, when I lose internet I see a clear "Offline — reconnecting…" overlay rather than a frozen screen — so I know the app is trying to reconnect.
 - **As a user**, when I'm offline the room meta line shows "· offline" in red — so I can tell at a glance the session is disconnected without needing to find the status dot.
 - **As any participant**, when a teammate disconnects, their entire chip fades to 40% opacity — no text label, "offline" shown as a tooltip on hover — so the team knows they are temporarily away without cluttering the strip.
-- **As any participant** on desktop and larger screens, ‹ › scroll buttons appear on the team strip only when there are enough participants to overflow — so small teams see a clean strip with no extra chrome, and large teams can navigate without horizontal swiping.
-- **As any participant** on phones, horizontal overflow is handled by direct swipe scrolling rather than dedicated ‹ › buttons — so the compact layout avoids extra controls in the narrow viewport.
 
 ### Timer
 
