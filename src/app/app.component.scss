@@ -208,6 +208,8 @@
   color: #424242 !important;
   position: relative;
   z-index: 1;
+  overflow: hidden;
+  white-space: nowrap;
 
   .toolbar-logo { margin-right: 4px; font-size: 16px; height: 16px; width: 16px; color: #9e9e9e; }
   .toolbar-spacer { flex: 1; }
@@ -218,6 +220,7 @@
     align-items: center;
     gap: 0;
     flex-shrink: 0;
+    min-width: 0;
   }
 
   .tb-divider {
@@ -235,6 +238,8 @@
     font-size: 0.75rem;
     color: #757575;
     margin-left: 6px;
+    min-width: 0;
+    overflow: hidden;
 
     .room-meta {
       font-size: 0.67rem;
@@ -265,6 +270,8 @@
     gap: 3px;
     font-size: 0.78rem;
     color: #616161;
+    min-width: 0;
+    white-space: nowrap;
     mat-icon { font-size: 15px; height: 15px; width: 15px; color: #9e9e9e; }
 
     .user-avatar {
@@ -280,6 +287,7 @@
     font-size: 0.75rem;
     color: #9e9e9e;
     margin-right: 8px;
+    white-space: nowrap;
     strong { color: #374151; }
   }
 }
@@ -409,6 +417,19 @@
   overflow-y: visible;
 }
 
+.compact-strip-row {
+  display: flex;
+  min-width: 0;
+}
+
+.compact-strip-row-cards {
+  flex: 0 0 auto;
+}
+
+.compact-strip-row-participants {
+  flex: 1 1 auto;
+}
+
 .strip-sep {
   width: 1px;
   background: #e0e0e0;
@@ -425,6 +446,7 @@
   align-items: flex-end;
   flex-shrink: 0;
   padding-bottom: 20px;
+  overflow: hidden;
 }
 
 .mini-card {
@@ -518,21 +540,19 @@
 
 // ── Team participants ─────────────────────────────────
 
-.team-chips {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: visible;
-  padding: 0 10px 20px;
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  .team-chips {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 10px 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 
-  &::-webkit-scrollbar { height: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+  &::-webkit-scrollbar { display: none; }
 }
 
 .p-chip {
@@ -868,6 +888,7 @@
     height: 100%;
     padding: 0 12px;
     box-sizing: border-box;
+    overflow-y: hidden;
   }
 
   .chips-nav-btn {
@@ -892,12 +913,21 @@
   }
 
   .p-chip {
-    padding-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 100%;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   .p-chip .pc-name {
-    top: auto;
-    bottom: 0;
+    position: static;
+    transform: none;
+    left: auto;
+    width: 44px;
     margin-top: 0;
   }
 
@@ -922,6 +952,213 @@
   }
 
   // ── Hide secondary room meta text ────────────────────
+  .room-meta {
+    display: none;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .register-bar {
+    height: auto;
+    min-height: 160px;
+  }
+
+  .reg-inputs {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    padding: 8px 12px;
+    align-items: center;
+    align-content: center;
+  }
+
+  .reg-input {
+    width: auto;
+    flex: 1 1 120px;
+    min-width: 0;
+  }
+
+  .reg-sm {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .reg-error {
+    flex: 1 1 100%;
+    white-space: normal;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .app-toolbar {
+    .toolbar-logo { margin-right: 2px; }
+
+    .toolbar-room {
+      flex: 1 1 auto;
+      margin-left: 4px;
+      font-size: 0.72rem;
+    }
+
+    .toolbar-spacer {
+      min-width: 4px;
+      flex: 0 1 auto;
+    }
+
+    .toolbar-right {
+      gap: 2px;
+    }
+
+    .toolbar-sep,
+    .tb-divider {
+      margin: 0 4px;
+    }
+  }
+
+  .chips-nav-btn {
+    display: none;
+  }
+
+  .team-nav {
+    overflow: visible;
+  }
+
+  .team-chips {
+    align-items: center;
+    padding: 0 12px 20px;
+  }
+
+  .mini-cards {
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .toolbar-overflow-trigger,
+  .toolbar-menu-trigger,
+  .touch-overflow-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #757575;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+    }
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (max-width: 599.98px) {
+  .app-shell {
+    height: auto;
+    min-height: 204px;
+  }
+
+  .compact-strip {
+    height: auto;
+    min-height: 168px;
+    padding: 0;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compact-strip-row {
+    width: 100%;
+  }
+
+  .compact-strip-row-cards,
+  .compact-strip-row-participants {
+    flex: 0 0 auto;
+  }
+
+  .strip-sep {
+    width: auto;
+    height: 1px;
+    margin: 0 12px;
+    align-self: auto;
+  }
+
+  .team-nav {
+    flex: 0 0 82px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .team-chips {
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .mini-cards {
+    flex: 0 0 84px;
+    align-items: center;
+    padding: 0 12px;
+    box-sizing: border-box;
+  }
+
+  .p-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 100%;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .p-chip .pc-name {
+    position: static;
+    transform: none;
+    left: auto;
+    width: 44px;
+    margin-top: 0;
+  }
+
+  .mini-card {
+    flex: 0 0 auto;
+    width: clamp(30px, 8vw, 38px);
+    height: clamp(42px, 11vw, 52px);
+
+    .mc-val { font-size: 0.85rem; }
+  }
+
+  .p-chip .pc-face {
+    width: clamp(30px, 8vw, 38px) !important;
+    height: clamp(42px, 11vw, 52px) !important;
+  }
+
+  .timer-widget,
+  .duration-chips,
+  .room-meta {
+    display: none !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (min-width: 600px) {
+  .app-shell {
+    height: 120px;
+  }
+
+  .compact-strip {
+    height: 80px;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
   .room-meta {
     display: none;
   }

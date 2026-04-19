@@ -1,14 +1,11 @@
-<!-- ═══════════════════════════════════════════════════════
-     REGISTRATION
-     ═══════════════════════════════════════════════════════ -->
+<!-- REGISTRATION -->
 @if (!isRegistered) {
   <div class="register-bar">
-    <!-- top row: brand -->
     <div class="reg-toolbar">
       <mat-icon class="toolbar-logo">style</mat-icon>
       <span class="toolbar-brand">Scrum Poker</span>
     </div>
-    <!-- bottom row: inputs + join -->
+
     <div class="reg-inputs">
       <input class="reg-input" [(ngModel)]="registerRoom" (keyup.enter)="register()"
              (ngModelChange)="registerError=''"
@@ -18,7 +15,6 @@
              placeholder="Your name" autocomplete="off"
              [class.reg-input-error]="registerError">
 
-      <!-- Avatar picker -->
       <label class="reg-avatar-btn" matTooltip="Pick a profile photo">
         @if (registerAvatar) {
           <img class="reg-avatar-preview" [src]="registerAvatar" alt="avatar">
@@ -36,205 +32,242 @@
         Join
       </button>
       @if (registerError) {
-        <span class="reg-error">⚠ {{ registerError }}</span>
+        <span class="reg-error">&#9888; {{ registerError }}</span>
       }
     </div>
   </div>
 }
 
-<!-- ═══════════════════════════════════════════════════════
-     MAIN APP
-     ═══════════════════════════════════════════════════════ -->
+<!-- MAIN APP -->
 @if (isRegistered) {
+  <ng-template #cardsStripTemplate>
+    <div class="mini-cards">
+      @for (card of FIBONACCI_CARDS; track card) {
+        <div class="mini-card"
+             [class.mc-selected]="selectedCard === card"
+             [class.mc-disabled]="cardsRevealed"
+             (click)="selectCard(card)"
+             [matTooltip]="cardsRevealed ? '' : 'Vote ' + card">
+          <span class="mc-corner mc-tl">{{ card }}</span>
+          <span class="mc-val">{{ card }}</span>
+          <span class="mc-corner mc-br">{{ card }}</span>
+        </div>
+      }
+    </div>
+  </ng-template>
+
+  <ng-template #participantsStripTemplate>
+    <div class="team-nav">
+      @if (showDesktopParticipantNav) {
+        <button class="chips-nav-btn"
+                (click)="scrollChips(-1)"
+                [disabled]="chipsAtStart"
+                matTooltip="Scroll left">&lt;</button>
+      }
+
+      <div class="team-chips" #chipsScroll (scroll)="onChipsScroll($event)">
+      @for (p of orderedParticipants; track p.name) {
+        <div class="p-chip"
+             [class.pc-voted]="p.voted"
+             [class.pc-revealed]="cardsRevealed"
+             [class.pc-alert]="nonVoterAlert && !p.voted"
+             [class.pc-me]="p.name === userName"
+             [class.pc-offline]="p.online === false"
+             [class.pc-kickable]="isScrumMaster && p.name !== userName"
+             (click)="isScrumMaster && p.name !== userName ? kickParticipant(p.name) : null"
+             [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' - click to remove' : (p.online === false ? p.name + ' - offline' : p.name)">
+          <div class="pc-face">
+            @if (cardsRevealed && p.voted) {
+              <span class="pc-value">{{ p.value }}</span>
+            } @else if (p.avatar) {
+              <img class="pc-avatar" [src]="p.avatar" alt=""
+                   [class.pc-avatar-voted]="p.voted">
+            } @else {
+              <span class="pc-unknown">?</span>
+            }
+            @if (missCount[p.name]) {
+              <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">&#215;{{ missCount[p.name] }}</span>
+            }
+          </div>
+          @if (p.voted && !cardsRevealed) {
+            <span class="voted-badge">&#10003;</span>
+          }
+          <span class="pc-name">{{ p.name }}</span>
+        </div>
+      }
+
+      @if (cardsRevealed) {
+        <div class="avg-chip">
+          <div class="avg-value">{{ averageVote }}</div>
+          <span class="avg-label">avg</span>
+        </div>
+      }
+      </div>
+
+      <span class="vote-float" #voteFloat>{{ voteFloatMsg }}</span>
+
+      @if (showDesktopParticipantNav) {
+        <button class="chips-nav-btn chips-nav-btn-right"
+                (click)="scrollChips(1)"
+                [disabled]="chipsAtEnd"
+                matTooltip="Scroll right">&gt;</button>
+      }
+    </div>
+  </ng-template>
+
   <div class="app-shell" [class.expanded]="isExpanded">
-  <div class="top-layout">
+    <div class="top-layout">
+      <mat-toolbar class="app-toolbar">
+        <mat-icon class="toolbar-logo" matTooltip="Scrum Poker">style</mat-icon>
+        <span class="toolbar-room">
+          {{ roomName }}
+          @if (roomCreatedBy) {
+            <span class="room-meta">
+              created by {{ roomCreatedBy }} - {{ roomCreatedAgo }}
+              @if (!connected) {
+                <span class="room-meta-offline"> - offline</span>
+              }
+            </span>
+          }
+        </span>
 
-    <!-- ── Toolbar (with timer controls inline) ─────────── -->
-    <mat-toolbar class="app-toolbar">
-      <mat-icon class="toolbar-logo" matTooltip="Scrum Poker">style</mat-icon>
-      <span class="toolbar-room">
-        {{ roomName }}
-        @if (roomCreatedBy) {
-          <span class="room-meta">created by {{ roomCreatedBy }} · {{ roomCreatedAgo }}@if (!connected) {<span class="room-meta-offline"> · offline</span>}</span>
-        }
-      </span>
+        <span class="toolbar-spacer"></span>
 
-      <span class="toolbar-spacer"></span>
+        @if (isScrumMaster) {
+          <div class="timer-widget">
+            @if (postTimerElapsed > 0) {
+              <span class="bar-time bar-time-overtime">+{{ postTimerElapsed }}s</span>
+            } @else {
+              <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
+            }
 
-      <!-- Timer: time + SM controls or participant hint -->
-      @if (isScrumMaster) {
-        <div class="timer-widget">
+            <button class="icon-btn"
+                    (click)="timerRunning ? pauseTimer() : startTimer()"
+                    [disabled]="!timerRunning && timerRemaining === 0"
+                    [matTooltip]="timerRunning ? 'Pause' : timerRemaining < timerDuration ? 'Resume' : 'Start'">
+              <mat-icon>{{ timerRunning ? 'pause' : 'play_arrow' }}</mat-icon>
+            </button>
+
+            @if (timerRemaining < timerDuration) {
+              <button class="icon-btn" (click)="resetTimer()" matTooltip="Reset timer">
+                <mat-icon>replay</mat-icon>
+              </button>
+            }
+
+            <div class="duration-chips">
+              @for (opt of TIMER_OPTIONS; track opt.value) {
+                <button class="dur-chip"
+                        [class.dur-chip-active]="timerDuration === opt.value"
+                        [disabled]="timerRunning"
+                        (click)="onDurationChange(opt.value)">{{ opt.label }}</button>
+              }
+            </div>
+          </div>
+
+          <span class="toolbar-sep"></span>
+
+          @if (!cardsRevealed) {
+            <button class="icon-btn" (click)="revealCards()" matTooltip="Reveal cards">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          } @else {
+            <button class="icon-btn" (click)="newRound()" matTooltip="New round">
+              <mat-icon>restart_alt</mat-icon>
+            </button>
+          }
+
+          <span class="toolbar-sep"></span>
+        } @else {
           @if (postTimerElapsed > 0) {
             <span class="bar-time bar-time-overtime">+{{ postTimerElapsed }}s</span>
           } @else {
             <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
           }
+          <span class="tb-divider"></span>
+          <span class="voted-hint">
+            @if (!cardsRevealed) {
+              {{ votedCount }}&thinsp;/&thinsp;{{ participants.length }} voted
+            } @else {
+              avg <strong>{{ averageVote }}</strong>
+            }
+          </span>
+        }
 
-          <!-- Single toggle button -->
-          <button class="icon-btn"
-                  (click)="timerRunning ? pauseTimer() : startTimer()"
-                  [disabled]="!timerRunning && timerRemaining === 0"
-                  [matTooltip]="timerRunning ? 'Pause' : timerRemaining < timerDuration ? 'Resume' : 'Start'">
-            <mat-icon>{{ timerRunning ? 'pause' : 'play_arrow' }}</mat-icon>
-          </button>
+        <div class="toolbar-right">
+          <span class="tb-divider"></span>
+          <span class="user-chip">
+            @if (registerAvatar) {
+              <img class="user-avatar" [src]="registerAvatar" alt="">
+            } @else {
+              <mat-icon>account_circle</mat-icon>
+            }
+            {{ userName }}
+          </span>
+          <span class="conn-dot" [class.conn-on]="connected" [matTooltip]="connected ? 'Connected' : 'Reconnecting...'"></span>
 
-          <!-- Reset — only when timer has been touched -->
-          @if (timerRemaining < timerDuration) {
-            <button class="icon-btn" (click)="resetTimer()" matTooltip="Reset timer">
-              <mat-icon>replay</mat-icon>
+          @if (showToolbarOverflow) {
+            <button class="icon-btn toolbar-overflow-trigger"
+                    [matMenuTriggerFor]="toolbarMenu"
+                    matTooltip="More actions">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          } @else {
+            <button class="icon-btn" (click)="logout()" matTooltip="Leave session">
+              <mat-icon>logout</mat-icon>
+            </button>
+            <button class="icon-btn" (click)="shareRoom()" matTooltip="Copy invite link">
+              <mat-icon>share</mat-icon>
+            </button>
+            <button class="icon-btn" (click)="openHelp()" matTooltip="Help">
+              <mat-icon>help_outline</mat-icon>
             </button>
           }
-
-          <!-- Duration chips -->
-          <div class="duration-chips">
-            @for (opt of TIMER_OPTIONS; track opt.value) {
-              <button class="dur-chip"
-                      [class.dur-chip-active]="timerDuration === opt.value"
-                      [disabled]="timerRunning"
-                      (click)="onDurationChange(opt.value)">{{ opt.label }}</button>
-            }
-          </div>
         </div>
+      </mat-toolbar>
 
-        <span class="toolbar-sep"></span>
-
-        @if (!cardsRevealed) {
-          <button class="icon-btn" (click)="revealCards()" matTooltip="Reveal cards">
-            <mat-icon>visibility</mat-icon>
-          </button>
-        } @else {
-          <button class="icon-btn" (click)="newRound()" matTooltip="New round">
-            <mat-icon>restart_alt</mat-icon>
-          </button>
-        }
-
-        <span class="toolbar-sep"></span>
-      } @else {
-        @if (postTimerElapsed > 0) {
-          <span class="bar-time bar-time-overtime">+{{ postTimerElapsed }}s</span>
-        } @else {
-          <span class="bar-time" [ngClass]="'bar-time-' + timerClass">{{ formatTime(timerRemaining) }}</span>
-        }
-        <span class="tb-divider"></span>
-        <span class="voted-hint">
-          @if (!cardsRevealed) {
-            {{ votedCount }}&thinsp;/&thinsp;{{ participants.length }} voted
-          } @else {
-            avg <strong>{{ averageVote }}</strong>
-          }
-        </span>
-      }
-
-      <div class="toolbar-right">
-        <span class="tb-divider"></span>
-        <span class="user-chip">
-          @if (registerAvatar) {
-            <img class="user-avatar" [src]="registerAvatar" alt="">
-          } @else {
-            <mat-icon>account_circle</mat-icon>
-          }
-          {{ userName }}
-        </span>
-        <span class="conn-dot" [class.conn-on]="connected" [matTooltip]="connected ? 'Connected' : 'Reconnecting…'"></span>
-        <button class="icon-btn" (click)="logout()" matTooltip="Leave session">
+      <mat-menu #toolbarMenu="matMenu" xPosition="before">
+        <button mat-menu-item (click)="logout()">
           <mat-icon>logout</mat-icon>
+          <span>Leave</span>
         </button>
-        <button class="icon-btn" (click)="shareRoom()" matTooltip="Copy invite link">
+        <button mat-menu-item (click)="shareRoom()">
           <mat-icon>share</mat-icon>
+          <span>Share</span>
         </button>
-        <button class="icon-btn" (click)="openHelp()" matTooltip="Help">
+        <button mat-menu-item (click)="openHelp()">
           <mat-icon>help_outline</mat-icon>
+          <span>Help</span>
         </button>
-      </div>
-    </mat-toolbar>
+      </mat-menu>
 
-    <!-- ── Cards + Team strip ────────────────────────────── -->
-    <div class="compact-strip">
-
-      <!-- Mini poker cards -->
-      <div class="mini-cards">
-        @for (card of FIBONACCI_CARDS; track card) {
-          <div class="mini-card"
-               [class.mc-selected]="selectedCard === card"
-               [class.mc-disabled]="cardsRevealed"
-               (click)="selectCard(card)"
-               [matTooltip]="cardsRevealed ? '' : 'Vote ' + card">
-            <span class="mc-corner mc-tl">{{ card }}</span>
-            <span class="mc-val">{{ card }}</span>
-            <span class="mc-corner mc-br">{{ card }}</span>
+      <div class="compact-strip">
+        @if (isTouchLayout && isNarrowTouchLayout) {
+          <div class="compact-strip-row compact-strip-row-participants">
+            <ng-container [ngTemplateOutlet]="participantsStripTemplate"></ng-container>
+          </div>
+          <div class="strip-sep"></div>
+          <div class="compact-strip-row compact-strip-row-cards">
+            <ng-container [ngTemplateOutlet]="cardsStripTemplate"></ng-container>
+          </div>
+        } @else {
+          <div class="compact-strip-row compact-strip-row-cards">
+            <ng-container [ngTemplateOutlet]="cardsStripTemplate"></ng-container>
+          </div>
+          <div class="strip-sep"></div>
+          <div class="compact-strip-row compact-strip-row-participants">
+            <ng-container [ngTemplateOutlet]="participantsStripTemplate"></ng-container>
           </div>
         }
       </div>
-
-      <div class="strip-sep"></div>
-
-      <!-- Team participants -->
-      <div class="team-nav">
-        @if (chipsOverflow) {
-          <button class="chips-nav-btn"
-                  (click)="scrollChips(-1)"
-                  [disabled]="chipsAtStart"
-                  matTooltip="Scroll left">‹</button>
-        }
-        <div class="team-chips" #chipsScroll (scroll)="onChipsScroll($event)">
-        @for (p of participants; track p.name) {
-          <div class="p-chip"
-               [class.pc-voted]="p.voted"
-               [class.pc-revealed]="cardsRevealed"
-               [class.pc-alert]="nonVoterAlert && !p.voted"
-               [class.pc-me]="p.name === userName"
-               [class.pc-offline]="p.online === false"
-               [class.pc-kickable]="isScrumMaster && p.name !== userName"
-               (click)="isScrumMaster && p.name !== userName ? kickParticipant(p.name) : null"
-               [matTooltip]="isScrumMaster && p.name !== userName ? p.name + ' — click to remove' : (p.online === false ? p.name + ' — offline' : p.name)">
-            <div class="pc-face">
-              @if (cardsRevealed && p.voted) {
-                <span class="pc-value">{{ p.value }}</span>
-              } @else if (p.avatar) {
-                <img class="pc-avatar" [src]="p.avatar" alt=""
-                     [class.pc-avatar-voted]="p.voted">
-              } @else {
-                <span class="pc-unknown">?</span>
-              }
-              @if (missCount[p.name]) {
-                <span class="miss-badge" [matTooltip]="'Missed ' + missCount[p.name] + ' deadline' + (missCount[p.name] > 1 ? 's' : '')">×{{ missCount[p.name] }}</span>
-              }
-            </div>
-            @if (p.voted && !cardsRevealed) {
-              <span class="voted-badge">✓</span>
-            }
-            <span class="pc-name">{{ p.name }}</span>
-          </div>
-        }
-
-        @if (cardsRevealed) {
-          <div class="avg-chip">
-            <div class="avg-value">{{ averageVote }}</div>
-            <span class="avg-label">avg</span>
-          </div>
-        }
-        </div><!-- /.team-chips -->
-        <span class="vote-float" #voteFloat>{{ voteFloatMsg }}</span>
-        @if (chipsOverflow) {
-          <button class="chips-nav-btn chips-nav-btn-right"
-                  (click)="scrollChips(1)"
-                  [disabled]="chipsAtEnd"
-                  matTooltip="Scroll right">›</button>
-        }
-      </div><!-- /.team-nav -->
-
     </div>
 
-  </div><!-- /.top-layout -->
-
-    <!-- ── Jira URL input (SM only) ──────────────────────── -->
     @if (isScrumMaster) {
       <div class="jira-input-bar">
         <mat-icon class="jira-icon">link</mat-icon>
         <input class="jira-url-input"
                [(ngModel)]="jiraUrl"
                (keyup.enter)="loadJira()"
-               placeholder="Jira Issue URL — e.g. https://company.atlassian.net/browse/PROJ-123" />
+               placeholder="Jira Issue URL - e.g. https://company.atlassian.net/browse/PROJ-123" />
         <button mat-flat-button color="primary" (click)="loadJira()">Load</button>
         @if (jiraLoaded) {
           <button mat-icon-button (click)="clearJira()" matTooltip="Clear">
@@ -244,7 +277,6 @@
       </div>
     }
 
-    <!-- ── Jira link ─────────────────────────────────────── -->
     <div class="jira-area">
       @if (jiraLoaded) {
         <a [href]="jiraUrl" target="_blank" rel="noopener" class="jira-issue-link">
@@ -255,20 +287,17 @@
           <mat-icon>open_in_browser</mat-icon>
           <span>
             @if (isScrumMaster) { Enter a Jira URL above to share with the team. }
-            @else { Waiting for Scrum Master to share a Jira issue… }
+            @else { Waiting for Scrum Master to share a Jira issue... }
           </span>
         </div>
       }
     </div>
-
   </div>
 
-  <!-- ── Offline overlay ──────────────────────────────── -->
   @if (!connected) {
     <div class="offline-overlay">
       <span class="offline-dot"></span>
-      <span class="offline-msg">Offline — reconnecting…</span>
+      <span class="offline-msg">Offline - reconnecting...</span>
     </div>
   }
-
 }

@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuModule } from '@angular/material/menu';
 
 export interface Participant {
   name: string;
@@ -77,12 +78,15 @@ const VOTE_MESSAGES = [
     CommonModule, FormsModule,
     MatToolbarModule, MatCardModule, MatButtonModule,
     MatInputModule, MatFormFieldModule, MatIconModule,
-    MatTooltipModule, MatSnackBarModule, MatSelectModule, MatCheckboxModule,
+    MatTooltipModule, MatSnackBarModule, MatSelectModule, MatCheckboxModule, MatMenuModule,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private static readonly DESKTOP_COMPACT_H = 120;
+  private static readonly TOUCH_STACK_BREAKPOINT = 600;
+  private static readonly NARROW_TOUCH_COMPACT_H = 208;
 
   readonly FIBONACCI_CARDS = ['1', '2', '3', '5', '8', '13', '21', '?', '☕'];
   readonly TIMER_OPTIONS = [
@@ -118,8 +122,14 @@ export class AppComponent implements OnInit, OnDestroy {
   registerError = '';
 
   // ── Layout ────────────────────────────────────────────
+  layoutMode: 'desktop' | 'touch' = 'desktop';
+  viewportWidth = window.innerWidth;
+
   private get COMPACT_H(): number {
-    return window.innerWidth < 480 ? 160 : 120;
+    if (!this.isTouchLayout) return AppComponent.DESKTOP_COMPACT_H;
+    return this.isNarrowTouchLayout
+      ? AppComponent.NARROW_TOUCH_COMPACT_H
+      : AppComponent.DESKTOP_COMPACT_H;
   }
   private _isExpanded = false;
 
@@ -127,6 +137,28 @@ export class AppComponent implements OnInit, OnDestroy {
   set isExpanded(v: boolean) {
     this._isExpanded = v;
     if (!v) this.snapCompact();
+  }
+
+  get isTouchLayout(): boolean {
+    return this.layoutMode === 'touch';
+  }
+
+  get isNarrowTouchLayout(): boolean {
+    return this.isTouchLayout && this.viewportWidth < AppComponent.TOUCH_STACK_BREAKPOINT;
+  }
+
+  get showDesktopParticipantNav(): boolean {
+    return !this.isTouchLayout && this.chipsOverflow;
+  }
+
+  get showToolbarOverflow(): boolean {
+    return this.isTouchLayout;
+  }
+
+  get orderedParticipants(): Participant[] {
+    const myChip = this.participants.find((participant) => participant.name === this.userName);
+    if (!myChip) return this.participants;
+    return [myChip, ...this.participants.filter((participant) => participant.name !== this.userName)];
   }
 
   // ── Miss score ────────────────────────────────────────
@@ -173,6 +205,28 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   // ── Alert / beep state ────────────────────────────────
+  private updateResponsiveState(): void {
+    this.viewportWidth = window.innerWidth;
+    this.layoutMode = this.detectLayoutMode();
+  }
+
+  private detectLayoutMode(): 'desktop' | 'touch' {
+    const nav = navigator as Navigator & { userAgentData?: { mobile?: boolean } };
+    const ua = nav.userAgent ?? '';
+    const platform = nav.platform ?? '';
+    const maxTouchPoints = nav.maxTouchPoints ?? 0;
+
+    const isPhone =
+      nav.userAgentData?.mobile === true ||
+      /Android.+Mobile|iPhone|iPod|Windows Phone|Mobile/i.test(ua);
+    const isTablet =
+      /iPad|Tablet|PlayBook|Silk|Kindle/i.test(ua) ||
+      (/Android/i.test(ua) && !/Mobile/i.test(ua)) ||
+      (platform === 'MacIntel' && maxTouchPoints > 0);
+
+    return isPhone || isTablet ? 'touch' : 'desktop';
+  }
+
   nonVoterAlert    = false;
   postTimerElapsed = 0;   // counts up for 10 s after timer hits 0; 0 = inactive
   private warningBeeped    = false;
@@ -189,6 +243,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // ── Lifecycle ─────────────────────────────────────────
 
   ngOnInit(): void {
+    this.updateResponsiveState();
     window.addEventListener('resize', this.onWindowResize);
     this.snapCompact();
 
@@ -572,6 +627,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private readonly onWindowResize = (): void => {
+    this.updateResponsiveState();
     if (!this._isExpanded) this.snapCompact();
+    setTimeout(() => this.updateChipsScrollState());
   };
 }
