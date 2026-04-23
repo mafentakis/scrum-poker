@@ -88,7 +88,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private static readonly TOUCH_STACK_BREAKPOINT = 600;
   private static readonly NARROW_TOUCH_COMPACT_H = 208;
 
-  readonly FIBONACCI_CARDS = ['1', '2', '3', '5', '8', '13', '21', '?', '☕'];
+  readonly FIBONACCI_CARDS = ['1', '2', '3', '5', '8', '13', '21', '40', '100', '?', '☕'];
   readonly TIMER_OPTIONS = [
     { label: '30 s',  value: 30 },
     { label: '1 min', value: 60 },
