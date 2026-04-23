@@ -511,8 +511,7 @@
   align-items: stretch;
   flex: 1;
   min-width: 0;
-  overflow-x: clip;
-  overflow-y: visible;
+  overflow: visible;
 }
 
 .chips-nav-btn {
@@ -689,7 +688,7 @@
 .vote-float {
   position: absolute;
   opacity: 0;
-  font-size: 0.72rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #5c35b5;
   white-space: nowrap;
