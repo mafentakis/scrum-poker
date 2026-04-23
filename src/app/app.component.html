@@ -240,7 +240,7 @@
         </button>
       </mat-menu>
 
-      <div class="compact-strip">
+      <div class="compact-strip" #compactStrip>
         @if (isTouchLayout && isNarrowTouchLayout) {
           <div class="compact-strip-row compact-strip-row-participants">
             <ng-container [ngTemplateOutlet]="participantsStripTemplate"></ng-container>
