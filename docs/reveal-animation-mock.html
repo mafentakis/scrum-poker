@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reveal Animation — Mock</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & base ────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #ececec;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  gap: 40px;
+}
+
+h1 { font-size: 0.8rem; font-weight: 500; color: #9e9e9e; letter-spacing: 1px; text-transform: uppercase; }
+.option-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #757575;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.option-desc {
+  font-size: 0.75rem;
+  color: #9e9e9e;
+  margin-bottom: 10px;
+  max-width: 460px;
+}
+
+/* ── App shell replica ───────────────────────────────── */
+.app-shell {
+  width: 480px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  background: white;
+}
+
+/* ── Toolbar ─────────────────────────────────────────── */
+.toolbar {
+  flex-shrink: 0;
+  height: 36px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 6px;
+}
+.tb-logo { font-size: 14px; color: #9e9e9e; }
+.tb-room { font-size: 0.75rem; color: #757575; }
+.tb-spacer { flex: 1; }
+.tb-badge {
+  font-size: 0.72rem;
+  color: #9e9e9e;
+  background: #eeeeee;
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+.tb-avg {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border-radius: 10px;
+  padding: 2px 8px;
+  display: none;
+}
+.tb-dot { width: 7px; height: 7px; border-radius: 50%; background: #9e9e9e; }
+
+/* ── Compact strip ───────────────────────────────────── */
+.compact-strip {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  padding: 0 0 0 10px;
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  gap: 0;
+  overflow: hidden;
+  position: relative;
+}
+.strip-sep {
+  width: 1px;
+  background: #e0e0e0;
+  margin: 0 10px;
+  align-self: stretch;
+}
+
+/* ── Mini cards ──────────────────────────────────────── */
+.mini-cards {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  padding-bottom: 18px;
+}
+.mini-card {
+  width: 28px;
+  height: 40px;
+  border-radius: 4px;
+  border: 1.5px solid #d0d0d0;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: #bdbdbd;
+  flex-shrink: 0;
+}
+.mini-card.selected {
+  background: #F3F4F6;
+  border-color: #374151;
+  color: #1F2937;
+  font-weight: 700;
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(55,65,81,0.2);
+}
+.mini-card.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ── Team chips ──────────────────────────────────────── */
+.team-nav {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  position: relative;
+}
+.team-chips {
+  display: flex;
+  gap: 7px;
+  align-items: flex-end;
+  padding: 0 8px 18px;
+  overflow: hidden;
+}
+.p-chip {
+  position: relative;
+  flex-shrink: 0;
+}
+.pc-face {
+  width: 32px;
+  height: 44px;
+  border-radius: 5px;
+  border: 1.5px solid #e0e0e0;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #bdbdbd;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.pc-face .pc-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1F2937;
+  display: none;
+}
+.pc-face .pc-unknown { display: block; }
+.pc-name {
+  position: absolute;
+  top: 100%;
+  margin-top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: #757575;
+  width: 38px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+.voted-badge {
+  position: absolute;
+  bottom: -4px;
+  left: -4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #374151;
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 700;
+  line-height: 13px;
+  text-align: center;
+  border: 1.5px solid #fafafa;
+}
+
+/* revealed state */
+.p-chip.revealed .pc-face {
+  background: white;
+  border-color: #9e9e9e;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+}
+.p-chip.revealed .pc-face .pc-value { display: block; }
+.p-chip.revealed .pc-face .pc-unknown { display: none; }
+.p-chip.revealed .voted-badge { display: none; }
+
+/* me chip */
+.p-chip.me .pc-face {
+  border-color: #374151;
+  border-width: 2px;
+  box-shadow: 0 0 0 2px rgba(55,65,81,0.15);
+}
+
+/* avg chip */
+.avg-chip {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: 2px;
+  display: none;
+}
+.avg-chip.show { display: block; }
+.avg-value {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e8f5e9;
+  border: 2px solid #43a047;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2e7d32;
+  margin-bottom: 2px;
+}
+.avg-label {
+  position: absolute;
+  top: 100%;
+  margin-top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.58rem;
+  color: #66bb6a;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+/* ── Reveal button (outside shell) ──────────────────── */
+.reveal-btn {
+  margin-top: 10px;
+  padding: 6px 18px;
+  border: none;
+  border-radius: 4px;
+  background: #374151;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.reveal-btn:hover:not(:disabled) { background: #1F2937; }
+.reveal-btn:disabled { background: #bdbdbd; cursor: default; }
+
+/* ── Option wrapper ──────────────────────────────────── */
+.option-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ════════════════════════════════════════════════════════
+   OPTION A — Particle burst
+   ════════════════════════════════════════════════════════ */
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@keyframes particle-fly {
+  0%   { opacity: 1;   transform: translate(0, 0) scale(1); }
+  70%  { opacity: 0.8; }
+  100% { opacity: 0;   transform: translate(var(--tx), var(--ty)) scale(0.3); }
+}
+
+/* ════════════════════════════════════════════════════════
+   OPTION B — Chip shimmer + avg pop
+   ════════════════════════════════════════════════════════ */
+
+@keyframes chip-reveal-flip {
+  0%   { transform: scaleX(1);    }
+  40%  { transform: scaleX(0);    }
+  41%  { transform: scaleX(0);    } /* value swaps here in JS */
+  100% { transform: scaleX(1);    }
+}
+
+@keyframes avg-pop {
+  0%   { transform: scale(0);   opacity: 0; }
+  60%  { transform: scale(1.25); opacity: 1; }
+  80%  { transform: scale(0.92); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+.avg-chip.pop { animation: avg-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+@keyframes shimmer-sweep {
+  0%   { left: -60%; }
+  100% { left: 120%; }
+}
+
+.pc-face .shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.7) 50%, transparent 60%);
+  width: 60%;
+  animation: shimmer-sweep 0.4s ease forwards;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════════
+   OPTION C — Ripple ring + score slam
+   ════════════════════════════════════════════════════════ */
+
+.ripple-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid #374151;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes ripple-out {
+  0%   { width: 10px; height: 10px; opacity: 0.6; }
+  100% { width: 120px; height: 120px; opacity: 0; }
+}
+
+@keyframes score-slam {
+  0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+  55%  { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+  75%  { transform: translate(-50%, -50%) scale(0.9); }
+  100% { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+}
+
+.score-splash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #374151;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+  text-shadow: 0 2px 12px rgba(55,65,81,0.25);
+}
+.score-splash.slam {
+  animation: score-slam 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+</style>
+</head>
+<body>
+
+<h1>Issue #2 — Reveal Celebration · Option Mocks</h1>
+
+<!-- ══════════════════════════════════════════════════════
+     OPTION A: Particle burst from chips area
+     ══════════════════════════════════════════════════════ -->
+<div class="option-block">
+  <div class="option-label">Option A — Particle burst</div>
+  <div class="option-desc">~50 tiny dots shoot out from the centre of the chips area in brand colours (#374151 charcoal, #5c6bc0 indigo, #43a047 green). Pure CSS keyframes + 10 lines of JS to spawn/remove nodes. Zero dependencies. Lasts 0.7 s.</div>
+
+  <div class="app-shell" id="shell-a">
+    <div class="toolbar">
+      <span class="tb-logo">♦</span>
+      <span class="tb-room">Team Alpha</span>
+      <span class="tb-spacer"></span>
+      <span class="tb-badge" id="badge-a">3 / 3 voted</span>
+      <span class="tb-avg" id="tbavg-a">avg 8.0</span>
+      <span class="tb-dot"></span>
+    </div>
+    <div class="compact-strip" id="strip-a">
+      <div class="mini-cards">
+        <div class="mini-card">1</div>
+        <div class="mini-card">2</div>
+        <div class="mini-card">3</div>
+        <div class="mini-card selected">5</div>
+        <div class="mini-card">8</div>
+        <div class="mini-card">13</div>
+      </div>
+      <div class="strip-sep"></div>
+      <div class="team-nav">
+        <div class="team-chips" id="chips-a">
+          <div class="p-chip me" data-val="5">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">5</span></div>
+            <span class="voted-badge">✓</span>
+            <span class="pc-name">You</span>
+          </div>
+          <div class="p-chip" data-val="8">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">8</span></div>
+            <span class="voted-badge">✓</span>
+            <span class="pc-name">Alice</span>
+          </div>
+          <div class="p-chip" data-val="13">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">13</span></div>
+            <span class="voted-badge">✓</span>
+            <span class="pc-name">Bob</span>
+          </div>
+          <div class="avg-chip" id="avg-a">
+            <div class="avg-value">8.7</div>
+            <span class="avg-label">avg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="reveal-btn" id="btn-a" onclick="revealA()">Reveal Cards</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     OPTION B: Chip shimmer sweep + avg spring pop
+     ══════════════════════════════════════════════════════ -->
+<div class="option-block">
+  <div class="option-label">Option B — Chip shimmer + avg spring pop</div>
+  <div class="option-desc">Each chip face gets a white shimmer sweep (staggered 60 ms apart) as it flips to show the value. The avg circle springs in with a slight overshoot. No particles — cleanest feel, most on-brand.</div>
+
+  <div class="app-shell" id="shell-b">
+    <div class="toolbar">
+      <span class="tb-logo">♦</span>
+      <span class="tb-room">Team Alpha</span>
+      <span class="tb-spacer"></span>
+      <span class="tb-badge" id="badge-b">3 / 3 voted</span>
+      <span class="tb-avg" id="tbavg-b">avg 8.7</span>
+      <span class="tb-dot"></span>
+    </div>
+    <div class="compact-strip">
+      <div class="mini-cards">
+        <div class="mini-card">1</div><div class="mini-card">2</div>
+        <div class="mini-card">3</div><div class="mini-card selected">5</div>
+        <div class="mini-card">8</div><div class="mini-card">13</div>
+      </div>
+      <div class="strip-sep"></div>
+      <div class="team-nav">
+        <div class="team-chips" id="chips-b">
+          <div class="p-chip me" data-val="5">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">5</span></div>
+            <span class="voted-badge">✓</span><span class="pc-name">You</span>
+          </div>
+          <div class="p-chip" data-val="8">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">8</span></div>
+            <span class="voted-badge">✓</span><span class="pc-name">Alice</span>
+          </div>
+          <div class="p-chip" data-val="13">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">13</span></div>
+            <span class="voted-badge">✓</span><span class="pc-name">Bob</span>
+          </div>
+          <div class="avg-chip" id="avg-b">
+            <div class="avg-value">8.7</div>
+            <span class="avg-label">avg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="reveal-btn" id="btn-b" onclick="revealB()">Reveal Cards</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     OPTION C: Ripple rings + centred score slam
+     ══════════════════════════════════════════════════════ -->
+<div class="option-block">
+  <div class="option-label">Option C — Ripple rings + centred score slam</div>
+  <div class="option-desc">Two expanding ripple rings pulse from the centre of the compact strip. The average value slams in at large scale, overshoots, and settles — then chips flip. Most dramatic. Best for consensus moments.</div>
+
+  <div class="app-shell" id="shell-c">
+    <div class="toolbar">
+      <span class="tb-logo">♦</span>
+      <span class="tb-room">Team Alpha</span>
+      <span class="tb-spacer"></span>
+      <span class="tb-badge" id="badge-c">3 / 3 voted</span>
+      <span class="tb-avg" id="tbavg-c">avg 8.7</span>
+      <span class="tb-dot"></span>
+    </div>
+    <div class="compact-strip" id="strip-c">
+      <div class="mini-cards">
+        <div class="mini-card">1</div><div class="mini-card">2</div>
+        <div class="mini-card">3</div><div class="mini-card selected">5</div>
+        <div class="mini-card">8</div><div class="mini-card">13</div>
+      </div>
+      <div class="strip-sep"></div>
+      <div class="team-nav">
+        <div class="team-chips" id="chips-c">
+          <div class="p-chip me" data-val="5">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">5</span></div>
+            <span class="voted-badge">✓</span><span class="pc-name">You</span>
+          </div>
+          <div class="p-chip" data-val="8">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">8</span></div>
+            <span class="voted-badge">✓</span><span class="pc-name">Alice</span>
+          </div>
+          <div class="p-chip" data-val="13">
+            <div class="pc-face"><span class="pc-unknown">?</span><span class="pc-value">13</span></div>
+            <span class="voted-badge">✓</span><span class="pc-name">Bob</span>
+          </div>
+          <div class="avg-chip" id="avg-c">
+            <div class="avg-value">8.7</div>
+            <span class="avg-label">avg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="reveal-btn" id="btn-c" onclick="revealC()">Reveal Cards</button>
+</div>
+
+<script>
+/* ── shared helpers ──────────────────────────────────── */
+function showRevealedChips(chipsEl, avgEl, badgeEl, tbAvgEl, btnEl) {
+  chipsEl.querySelectorAll('.p-chip').forEach(function(chip) {
+    chip.classList.add('revealed');
+  });
+  avgEl.classList.add('show');
+  badgeEl.style.display = 'none';
+  tbAvgEl.style.display = 'inline';
+  btnEl.disabled = true;
+  btnEl.textContent = 'Revealed';
+}
+
+function resetShell(chipsId, avgId, badgeId, tbAvgId, btnId) {
+  var chips = document.getElementById(chipsId);
+  chips.querySelectorAll('.p-chip').forEach(function(c) { c.classList.remove('revealed'); });
+  document.getElementById(avgId).classList.remove('show', 'pop');
+  document.getElementById(badgeId).style.display = '';
+  document.getElementById(tbAvgId).style.display = 'none';
+  var btn = document.getElementById(btnId);
+  btn.disabled = false;
+  btn.textContent = 'Reveal Cards';
+}
+
+/* ════════════════════════════════════════════════════════
+   OPTION A — Particle burst
+   ════════════════════════════════════════════════════════ */
+var COLORS_A = ['#374151','#374151','#5c6bc0','#43a047','#9e9e9e','#1F2937'];
+
+function revealA() {
+  var strip  = document.getElementById('strip-a');
+  var chips  = document.getElementById('chips-a');
+  var avg    = document.getElementById('avg-a');
+  var btn    = document.getElementById('btn-a');
+
+  // spawn particles from centre of chips area
+  var stripRect  = strip.getBoundingClientRect();
+  var chipsRect  = chips.getBoundingClientRect();
+  var cx = chipsRect.left - stripRect.left + chipsRect.width  / 2;
+  var cy = chipsRect.top  - stripRect.top  + chipsRect.height / 2;
+
+  for (var i = 0; i < 48; i++) {
+    (function(i) {
+      var el = document.createElement('span');
+      el.className = 'particle';
+      var angle = (i / 48) * 360 + Math.random() * 10;
+      var dist  = 40 + Math.random() * 60;
+      var tx = Math.cos(angle * Math.PI / 180) * dist;
+      var ty = Math.sin(angle * Math.PI / 180) * dist;
+      var size = 3 + Math.random() * 4;
+      el.style.cssText = [
+        'left:'   + cx + 'px',
+        'top:'    + cy + 'px',
+        'width:'  + size + 'px',
+        'height:' + size + 'px',
+        'background:' + COLORS_A[Math.floor(Math.random() * COLORS_A.length)],
+        '--tx:' + tx + 'px',
+        '--ty:' + ty + 'px',
+        'animation: particle-fly ' + (0.5 + Math.random() * 0.3) + 's ' +
+          (Math.random() * 0.1) + 's ease-out forwards',
+      ].join(';');
+      strip.appendChild(el);
+      setTimeout(function() { el.remove(); }, 900);
+    })(i);
+  }
+
+  setTimeout(function() {
+    showRevealedChips(chips, avg, document.getElementById('badge-a'),
+                      document.getElementById('tbavg-a'), btn);
+    avg.classList.add('pop');
+  }, 200);
+
+  setTimeout(function() { resetShell('chips-a','avg-a','badge-a','tbavg-a','btn-a'); }, 4000);
+}
+
+/* ════════════════════════════════════════════════════════
+   OPTION B — Chip shimmer + avg spring pop
+   ════════════════════════════════════════════════════════ */
+function revealB() {
+  var chips = document.getElementById('chips-b');
+  var avg   = document.getElementById('avg-b');
+  var btn   = document.getElementById('btn-b');
+  var pchips = chips.querySelectorAll('.p-chip');
+
+  pchips.forEach(function(chip, idx) {
+    setTimeout(function() {
+      var face = chip.querySelector('.pc-face');
+      // Add shimmer
+      var shim = document.createElement('div');
+      shim.className = 'shimmer';
+      face.appendChild(shim);
+      setTimeout(function() { shim.remove(); }, 450);
+      // Reveal after shimmer midpoint
+      setTimeout(function() { chip.classList.add('revealed'); }, 200);
+    }, idx * 80);
+  });
+
+  var lastDelay = (pchips.length - 1) * 80 + 250;
+  setTimeout(function() {
+    avg.classList.add('show', 'pop');
+    document.getElementById('badge-b').style.display = 'none';
+    document.getElementById('tbavg-b').style.display = 'inline';
+    btn.disabled = true;
+    btn.textContent = 'Revealed';
+  }, lastDelay);
+
+  setTimeout(function() { resetShell('chips-b','avg-b','badge-b','tbavg-b','btn-b'); }, 4000);
+}
+
+/* ════════════════════════════════════════════════════════
+   OPTION C — Ripple rings + centred score slam
+   ════════════════════════════════════════════════════════ */
+function revealC() {
+  var strip = document.getElementById('strip-c');
+  var chips = document.getElementById('chips-c');
+  var avg   = document.getElementById('avg-c');
+  var btn   = document.getElementById('btn-c');
+
+  var stripRect = strip.getBoundingClientRect();
+  var cx = stripRect.width / 2;
+  var cy = stripRect.height / 2;
+
+  // Score splash
+  var splash = document.createElement('div');
+  splash.className = 'score-splash';
+  splash.textContent = '8.7';
+  splash.style.left = cx + 'px';
+  splash.style.top  = cy + 'px';
+  strip.appendChild(splash);
+  void splash.offsetWidth;
+  splash.classList.add('slam');
+
+  // Two staggered ripple rings
+  [0, 150].forEach(function(delay) {
+    setTimeout(function() {
+      var ring = document.createElement('div');
+      ring.className = 'ripple-ring';
+      ring.style.left = cx + 'px';
+      ring.style.top  = cy + 'px';
+      ring.style.animation = 'ripple-out 0.7s ease-out forwards';
+      strip.appendChild(ring);
+      setTimeout(function() { ring.remove(); }, 750);
+    }, delay);
+  });
+
+  // Chips reveal after splash settles
+  setTimeout(function() {
+    splash.remove();
+    showRevealedChips(chips, avg, document.getElementById('badge-c'),
+                      document.getElementById('tbavg-c'), btn);
+    avg.classList.add('pop');
+  }, 600);
+
+  setTimeout(function() { resetShell('chips-c','avg-c','badge-c','tbavg-c','btn-c'); }, 4000);
+}
+
+// Hide tbavg on load
+document.querySelectorAll('.tb-avg').forEach(function(el) { el.style.display = 'none'; });
+</script>
+</body>
+</html>

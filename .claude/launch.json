@@ -19,5 +19,11 @@
       "runtimeArgs": ["run", "--rm", "-p", "3456:3000", "--name", "scrum-poker-preview", "scrum-pocker-scrum-poker"],
       "port": 3456
     }
+  ,{
+      "name": "Docs",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "docs", "--listen", "4202", "--no-clipboard"],
+      "port": 4202
+    }
   ]
 }
