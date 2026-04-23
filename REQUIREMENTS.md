@@ -60,7 +60,7 @@ Role is self-selected at registration (no authentication required).
 
 ## Card Deck
 
-- **Fibonacci sequence**: `1, 2, 3, 5, 8, 13, 21, ?, ☕`
+- **Card deck**: `1, 2, 3, 5, 8, 13, 21, 40, 100, ?, ☕` — standard Fibonacci plus 40 and 100 for larger stories/epics
 - Cards are displayed as a compact single horizontal row, always visible.
 - Clicking a card casts/changes the vote.
 - Selected card is highlighted (lifted, accent border).
@@ -290,7 +290,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 
 ### Voting
 
-- **As a participant**, I can click any card in the Fibonacci row (`1 2 3 5 8 13 21 ? ☕`) to cast or change my vote — so estimation is a single click.
+- **As a participant**, I can click any card in the deck (`1 2 3 5 8 13 21 40 100 ? ☕`) to cast or change my vote — so estimation is a single click.
 - **As a participant**, I can click my already-selected card a second time to undo my vote — my chip snaps back to `?` and the vote count drops, as if I never voted.
 - **As a participant**, my selected card is visually highlighted (lifted with an accent border) — so I always know which value I submitted.
 - **As a participant**, cards are disabled after the SM reveals — so I cannot change my vote after reveal.
