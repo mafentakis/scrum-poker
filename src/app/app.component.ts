@@ -177,6 +177,7 @@ export class AppComponent implements OnInit, OnDestroy {
   connected = false;
 
   // ── Team chips scroll ─────────────────────────────────
+  @ViewChild('compactStrip') private compactStripRef?: ElementRef<HTMLElement>;
   @ViewChild('chipsScroll') chipsScrollRef!: ElementRef<HTMLElement>;
   @ViewChild('voteFloat')  private voteFloatRef?: ElementRef<HTMLElement>;
   chipsAtStart   = true;
@@ -369,9 +370,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private applyState(s: ServerState): void {
     const prevRemaining = this.timerRemaining;
+    const wasRevealed   = this.cardsRevealed;
 
     this.participants  = s.participants;
     this.cardsRevealed = s.cardsRevealed;
+
+    if (!wasRevealed && s.cardsRevealed) {
+      setTimeout(() => this.fireRevealParticles());
+    }
     setTimeout(() => this.updateChipsScrollState());
     this.missCount     = s.missCount ?? {};
     this.timerDuration = s.timerDuration;
@@ -601,6 +607,43 @@ export class AppComponent implements OnInit, OnDestroy {
   clearJira(): void {
     this.jiraUrl = '';
     this.send({ type: 'setJiraUrl', url: '' });
+  }
+
+  // ── Reveal particle burst ─────────────────────────────
+
+  private readonly PARTICLE_COLORS = ['#374151','#374151','#5c6bc0','#43a047','#9e9e9e','#1F2937'];
+
+  private fireRevealParticles(): void {
+    const host  = this.compactStripRef?.nativeElement;
+    const chips = this.chipsScrollRef?.nativeElement;
+    if (!host || !chips) return;
+
+    const hostRect  = host.getBoundingClientRect();
+    const chipsRect = chips.getBoundingClientRect();
+    const cx = chipsRect.left - hostRect.left + chipsRect.width  / 2;
+    const cy = chipsRect.top  - hostRect.top  + chipsRect.height / 2;
+
+    for (let i = 0; i < 48; i++) {
+      const el    = document.createElement('span');
+      el.className = 'particle';
+      const angle  = (i / 48) * 360 + Math.random() * 10;
+      const dist   = 35 + Math.random() * 55;
+      const tx     = Math.cos(angle * Math.PI / 180) * dist;
+      const ty     = Math.sin(angle * Math.PI / 180) * dist;
+      const size   = 3 + Math.random() * 4;
+      const dur    = 0.5 + Math.random() * 0.3;
+      const delay  = Math.random() * 0.08;
+      const color  = this.PARTICLE_COLORS[Math.floor(Math.random() * this.PARTICLE_COLORS.length)];
+      el.style.cssText = [
+        `left:${cx}px`, `top:${cy}px`,
+        `width:${size}px`, `height:${size}px`,
+        `background:${color}`,
+        `--tx:${tx}px`, `--ty:${ty}px`,
+        `--dur:${dur}s`, `--delay:${delay}s`,
+      ].join(';');
+      host.appendChild(el);
+      setTimeout(() => el.remove(), (dur + delay + 0.15) * 1000);
+    }
   }
 
   // ── Beep ──────────────────────────────────────────────
