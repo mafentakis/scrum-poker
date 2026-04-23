@@ -299,6 +299,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 ### Session Control (Scrum Master)
 
 - **As the SM**, I can click **Reveal** to show everyone's votes at the same time — so no anchoring bias occurs.
+- **As any participant**, when the last eligible online voter casts their vote the cards are **automatically revealed** and the timer stops — so the team never has to wait for the SM to manually reveal when everyone is already done. (Eligible = online, non-SM participants. Rooms with zero eligible voters, e.g. SM-only, are excluded.)
 - **As the SM**, I can click **New Round** to clear all votes and start estimating the next story.
 - **As the SM**, I can enter a Jira issue URL in expanded mode and click **Load** to share the link with all participants — so the team can read the ticket while estimating.
 - **As the SM**, I can clear the shared Jira link — so the link area resets between stories.

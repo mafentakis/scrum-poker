@@ -288,6 +288,14 @@ wss.on('connection', (ws) => {
           p.voted = true;
           p.value = String(msg.value ?? '');
           room.lastActivity = Date.now();
+
+          // Auto-reveal when every online non-SM participant has voted
+          const eligible = room.participants.filter(p => !p.isSM && p.online !== false);
+          if (eligible.length > 0 && eligible.every(p => p.voted)) {
+            room.cardsRevealed = true;
+            stopTimer(room);
+          }
+
           broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
         }
         break;
