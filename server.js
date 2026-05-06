@@ -284,16 +284,18 @@ wss.on('connection', (ws) => {
         const room = rooms.get(roomName);
         if (!room) break;
         const p = room.participants.find(p => p.name === ws.participantName);
-        if (p && !room.cardsRevealed) {
+        if (p) {
           p.voted = true;
           p.value = String(msg.value ?? '');
           room.lastActivity = Date.now();
 
           // Auto-reveal when every online non-SM participant has voted
-          const eligible = room.participants.filter(p => !p.isSM && p.online !== false);
-          if (eligible.length > 0 && eligible.every(p => p.voted)) {
-            room.cardsRevealed = true;
-            stopTimer(room);
+          if (!room.cardsRevealed) {
+            const eligible = room.participants.filter(p => !p.isSM && p.online !== false);
+            if (eligible.length > 0 && eligible.every(p => p.voted)) {
+              room.cardsRevealed = true;
+              stopTimer(room);
+            }
           }
 
           broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
@@ -305,7 +307,7 @@ wss.on('connection', (ws) => {
         const room = rooms.get(roomName);
         if (!room) break;
         const p = room.participants.find(p => p.name === ws.participantName);
-        if (p && !room.cardsRevealed) {
+        if (p) {
           p.voted = false;
           p.value = null;
           room.lastActivity = Date.now();

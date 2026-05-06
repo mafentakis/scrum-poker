@@ -45,9 +45,8 @@
       @for (card of FIBONACCI_CARDS; track card) {
         <div class="mini-card"
              [class.mc-selected]="selectedCard === card"
-             [class.mc-disabled]="cardsRevealed"
              (click)="selectCard(card)"
-             [matTooltip]="cardsRevealed ? '' : 'Vote ' + card">
+             [matTooltip]="cardsRevealed ? 'Change vote to ' + card : 'Vote ' + card">
           <span class="mc-corner mc-tl">{{ card }}</span>
           <span class="mc-val">{{ card }}</span>
           <span class="mc-corner mc-br">{{ card }}</span>
