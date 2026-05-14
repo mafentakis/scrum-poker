@@ -64,7 +64,7 @@ Role is self-selected at registration (no authentication required).
 - Cards are displayed as a compact single horizontal row, always visible.
 - Clicking a card casts/changes the vote.
 - Selected card is highlighted (lifted, accent border).
-- Cards are disabled after the SM reveals.
+- After the SM reveals, participants can still change their vote to reflect new insights gained from the discussion.
 - Corner indices (playing-card style) on each card.
 - Card numbers are muted (`#bdbdbd`, normal weight) at rest — bold dark (`#1F2937`, `font-weight: 700`) when selected, so the chosen value stands out without visual noise at rest.
 
@@ -295,6 +295,7 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As a participant**, my selected card is visually highlighted (lifted with an accent border) — so I always know which value I submitted.
 - **As a participant**, cards are disabled after the SM reveals — so I cannot change my vote after reveal.
 - **As a participant**, my vote is restored from the server after a page refresh — so a network blip doesn't lose my selection.
+- **As a participant**, I can change my vote after cards are revealed — so I can reflect new insights gained from the team's discussion.
 
 ### Session Control (Scrum Master)
 
