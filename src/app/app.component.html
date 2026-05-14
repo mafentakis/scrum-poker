@@ -170,6 +170,11 @@
             <button class="icon-btn" (click)="revealCards()" matTooltip="Reveal cards">
               <mat-icon>visibility</mat-icon>
             </button>
+            @if (votedCount > 0) {
+              <button class="icon-btn" (click)="newRound()" matTooltip="Clear all votes">
+                <mat-icon>restart_alt</mat-icon>
+              </button>
+            }
           } @else {
             <button class="icon-btn" (click)="newRound()" matTooltip="New round">
               <mat-icon>restart_alt</mat-icon>
