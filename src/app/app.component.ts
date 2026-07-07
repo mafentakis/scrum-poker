@@ -393,6 +393,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // Reset warning flag when timer resets to full; also kill the post-timer overlay
     if (s.timerRemaining >= s.timerDuration - 1 || s.timerRunning) {
       this.warningBeeped = false;
+      this.nonVoterAlert = false;
       this.clearPostTimer();
     }
 
