@@ -493,7 +493,6 @@ export class AppComponent implements OnInit, OnDestroy {
   // ── Cards ─────────────────────────────────────────────
 
   selectCard(value: string): void {
-    if (this.cardsRevealed) return;
     if (this.selectedCard === value) {
       this.selectedCard = null;         // optimistic deselect
       this.send({ type: 'unvote' });
