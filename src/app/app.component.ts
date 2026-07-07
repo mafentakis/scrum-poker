@@ -232,6 +232,7 @@ export class AppComponent implements OnInit, OnDestroy {
   postTimerElapsed = 0;   // counts up for 10 s after timer hits 0; 0 = inactive
   private warningBeeped    = false;
   private destroying       = false;
+  private clientId         = '';
   private ws: WebSocket | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private postTimerInterval: ReturnType<typeof setInterval> | null = null;
@@ -251,6 +252,14 @@ export class AppComponent implements OnInit, OnDestroy {
     // Pre-fill room from ?room= invite link
     const urlRoom = new URLSearchParams(location.search).get('room');
     if (urlRoom) this.registerRoom = urlRoom.trim().slice(0, 64);
+
+    // Stable per-browser id — lets the server distinguish "same user reconnecting"
+    // from "different user wants the same name" when a stale connection lingers
+    this.clientId = localStorage.getItem('scrumPokerClientId') ?? '';
+    if (!this.clientId) {
+      this.clientId = crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem('scrumPokerClientId', this.clientId);
+    }
 
     const saved = localStorage.getItem('scrumPokerUser');
     if (saved) {
@@ -290,7 +299,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.zone.run(() => {
         this.connected = true;
         if (this.isRegistered) {
-          this.send({ type: 'join', room: this.roomName, name: this.userName, isSM: this.isScrumMaster, avatar: this.registerAvatar });
+          this.send({ type: 'join', room: this.roomName, name: this.userName, isSM: this.isScrumMaster, avatar: this.registerAvatar, clientId: this.clientId });
         }
       });
     };
@@ -323,9 +332,17 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     };
 
-    ws.onclose = () => {
+    ws.onclose = (ev) => {
       this.zone.run(() => {
         this.connected = false;
+        if (ev.code === 4000) {
+          // Our name was (re)claimed from another window of this browser — that
+          // session wins; return this one to the login bar instead of rejoining.
+          this.isRegistered = false;
+          this.selectedCard = null;
+          this.snackBar.open('Session continued in another window.', 'OK',
+            { duration: 6000, panelClass: 'snack-warn' });
+        }
         if (!this.destroying) {
           this.reconnectTimer = setTimeout(() => this.connectWS(), 2000);
         }
@@ -464,7 +481,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isRegistered  = true;
     if (this.registerAvatar) localStorage.setItem('scrumPokerAvatar', this.registerAvatar);
     localStorage.setItem('scrumPokerUser', JSON.stringify({ name, room, isSM: this.isScrumMaster }));
-    this.send({ type: 'join', room, name, isSM: this.isScrumMaster, avatar: this.registerAvatar });
+    this.send({ type: 'join', room, name, isSM: this.isScrumMaster, avatar: this.registerAvatar, clientId: this.clientId });
   }
 
   shareRoom(): void {
