@@ -27,6 +27,7 @@ const rooms = new Map();
 
 const ROOM_TTL_MS       = 10 * 60 * 1000; // 10 minutes idle → sweep
 const ROOM_EMPTY_TTL_MS = 30_000;           // destroy room 30 s after last participant leaves
+const HEARTBEAT_INTERVAL_MS = Number(process.env.HEARTBEAT_INTERVAL_MS) || 30_000; // ping cadence; a socket that misses one full interval is terminated
 
 // emptyRoomTimers: Map<roomName, TimeoutHandle>
 const emptyRoomTimers = new Map();
@@ -211,9 +212,13 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocketServer({ server, path: '/ws' });
 
 wss.on('connection', (ws) => {
-  // ws.roomName and ws.participantName set after 'join'
+  // ws.roomName, ws.participantName and ws.clientId set after 'join'
   ws.roomName        = null;
   ws.participantName = null;
+  ws.clientId        = null;
+  ws.isAlive         = true;
+
+  ws.on('pong', () => { ws.isAlive = true; });
 
   ws.on('message', (raw) => {
     let msg;
@@ -227,17 +232,26 @@ wss.on('connection', (ws) => {
       case 'join': {
         const participantName = String(msg.name ?? '').trim().slice(0, 64);
         const isSM = Boolean(msg.isSM);
+        const clientId = String(msg.clientId ?? '').slice(0, 64);
         if (!participantName || !roomName) break;
 
-        // Reject if another active connection already holds this name in the room
-        const takenByOther = [...wss.clients].some(
+        // Connections that already hold this name in the room
+        const holders = [...wss.clients].filter(
           c => c !== ws && c.readyState === 1 &&
                c.roomName === roomName && c.participantName === participantName
         );
-        if (takenByOther) {
+        // A different client may not take the name; the same browser (matching
+        // clientId) may displace its own leftover socket — e.g. after a silent
+        // network timeout the old connection can linger in OPEN state.
+        if (holders.some(c => !clientId || c.clientId !== clientId)) {
           ws.send(JSON.stringify({ type: 'error', code: 'NAME_TAKEN', name: participantName }));
           break;
         }
+        holders.forEach(c => {
+          c.participantName = null; // its 'close' handler must not touch the participant
+          c.roomName        = null;
+          c.close(4000, 'superseded'); // live duplicate tab returns to login; a dead socket is reaped by the heartbeat
+        });
 
         // Reject if room already has an active SM and this join requests SM role
         if (isSM) {
@@ -255,6 +269,7 @@ wss.on('connection', (ws) => {
 
         ws.roomName        = roomName;
         ws.participantName = participantName;
+        ws.clientId        = clientId;
 
         // Cancel any pending room-destroy timer — someone is (re)joining
         cancelEmptyRoomTimer(roomName);
@@ -426,7 +441,12 @@ wss.on('connection', (ws) => {
     // Mark participant offline — they stay in the room indefinitely until they reconnect
     const room = rooms.get(roomName);
     if (room) {
-      const p = room.participants.find(p => p.name === participantName);
+      // A newer connection may already hold this identity (fast reconnect) — leave it alone
+      const takenOver = [...wss.clients].some(
+        c => c !== ws && c.readyState === 1 &&
+             c.roomName === roomName && c.participantName === participantName
+      );
+      const p = !takenOver && room.participants.find(p => p.name === participantName);
       if (p) {
         p.online = false;
         broadcastRoom(roomName, { type: 'state', data: snapshot(room) });
@@ -438,6 +458,18 @@ wss.on('connection', (ws) => {
 
   ws.on('error', err => console.error('[ws error]', err.message));
 });
+
+// Heartbeat — a silent network drop (idle timeout, sleep, NAT reset) leaves the
+// socket OPEN forever, keeping a ghost participant "online" and blocking its name.
+// Terminating unresponsive sockets fires their 'close' handler, which frees the name.
+const heartbeatTimer = setInterval(() => {
+  wss.clients.forEach(ws => {
+    if (ws.isAlive === false) { ws.terminate(); return; }
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, HEARTBEAT_INTERVAL_MS);
+wss.on('close', () => clearInterval(heartbeatTimer));
 
 const PORT = process.env.PORT ?? 3000;
 server.listen(PORT, () => {

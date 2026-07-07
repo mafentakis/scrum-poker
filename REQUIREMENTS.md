@@ -25,6 +25,7 @@ Role is self-selected at registration (no authentication required).
   - **"as scrum master"** checkbox
 - **Join** button is disabled until both fields are filled. Submits on Enter key.
 - **Duplicate name prevention**: if another active connection already holds the same name in the room, the server rejects the join with a `NAME_TAKEN` error. The name input turns red and an inline error message is shown. The check is connection-based — a disconnected participant (e.g. page refresh) can reclaim their own name.
+- **Same-browser reclaim (client id)**: every browser carries a persistent random `clientId` (localStorage) sent with each `join`. If the connection currently holding the name belongs to the **same browser** (matching `clientId`) — e.g. a stale socket left over after a silent network timeout — the new join **displaces** it instead of being rejected: the old socket is closed with WebSocket code `4000` (*superseded*) and the participant is taken over seamlessly. A displaced window that is still alive (e.g. a duplicate tab) shows *"Session continued in another window."* and returns to the login bar without auto-rejoining. Joins from a **different** browser are still rejected with `NAME_TAKEN`.
 - **One Scrum Master per room**: if the room already has an active SM, a second join with the SM checkbox ticked is rejected with an `SM_TAKEN` error. The inline message names the existing SM: *"&lt;name&gt; is already the Scrum Master in this room."*
 - All three values are persisted in `localStorage` and **pre-filled** on the next page load so the user can rejoin with one click.
 - A **Leave session** button (toolbar) logs the user out; the participant is immediately removed from the room on the server.
@@ -44,7 +45,9 @@ Role is self-selected at registration (no authentication required).
 |---|---|
 | Join (WS `join` message) | Added to room if not present; previous state (vote, SM role, avatar) restored if name already exists |
 | Page refresh / network blip | WS closes; chip immediately fades to 40% opacity (tooltip shows "offline") — participant **stays in the room indefinitely** until they reconnect or log out |
+| Silent connection drop (idle timeout, laptop sleep, NAT reset) | Server **heartbeat** (WS ping every 30 s, `HEARTBEAT_INTERVAL_MS`) terminates sockets that stop answering pongs — within ≤ 2 intervals the participant is marked offline and their name is free again |
 | Reconnect | Vote, SM role, and avatar fully restored — no data loss as long as the server hasn't restarted |
+| Rejoin while a stale socket of the same browser is still open | Stale socket displaced (close code `4000`); participant continues under the new connection — never a duplicate, never `NAME_TAKEN` |
 | Logout (WS `leave` message) | Participant **removed** from room immediately |
 | All participants offline | Room **cleanup timer** starts (default 30 s, configurable via `ROOM_EMPTY_TTL_MS`). Cancelled immediately if anyone reconnects |
 | Cleanup timer expires | Room destroyed — all state lost |
@@ -185,13 +188,14 @@ Total height: 120 px  (fixed, resize-locked in standalone PWA)
 - **State**: In-memory `Map<roomName, RoomState>`.
 - **Timer**: Server-side `setInterval` per room; broadcasts `state` every second and `timerEnd` at zero.
 - **Room cleanup**: Two mechanisms — hourly sweep deletes rooms idle > 10 min (`ROOM_TTL_MS`); per-room timer destroys room 30 s after last participant goes offline (`ROOM_EMPTY_TTL_MS`).
+- **Connection heartbeat**: WS ping every 30 s (`HEARTBEAT_INTERVAL_MS`, env-configurable); a socket that misses one full interval without a pong is terminated. Prevents silently dropped connections from keeping ghost participants "online" and blocking their names.
 - **Status API**: `GET /` returns active room summary (JSON).
 
 ### WebSocket message types
 
 | Direction | Type | Payload |
 |---|---|---|
-| C → S | `join` | `room, name, isSM` |
+| C → S | `join` | `room, name, isSM, avatar, clientId` |
 | C → S | `vote` | `room, value` |
 | C → S | `unvote` | `room` |
 | C → S | `reveal` | `room` |
@@ -207,6 +211,8 @@ Total height: 120 px  (fixed, resize-locked in standalone PWA)
 | S → C | `timerEnd` | full `RoomState` snapshot |
 | S → C | `kicked` | _(no payload — sent only to the removed client)_ |
 
+Additionally, when the same browser re-claims its name from another connection, the displaced socket is closed with WebSocket close code **`4000`** (reason `superseded`) — the client treats this as "session continued elsewhere" and returns to the login bar instead of auto-rejoining.
+
 ---
 
 ## Browser Persistence (localStorage)
@@ -214,8 +220,10 @@ Total height: 120 px  (fixed, resize-locked in standalone PWA)
 | Key | Value |
 |---|---|
 | `scrumPokerUser` | `{ name, room, isSM }` |
+| `scrumPokerAvatar` | base64 JPEG profile photo (64 × 64) |
+| `scrumPokerClientId` | random UUID identifying this browser — sent with every `join` so the server can tell "same user reconnecting" from "different user wants the same name" |
 
-Pre-fills the registration form on reload. Cleared on logout.
+`scrumPokerUser` pre-fills the registration form on reload and is cleared on logout; `scrumPokerAvatar` and `scrumPokerClientId` persist across sessions.
 
 ---
 
@@ -225,7 +233,7 @@ Pre-fills the registration form on reload. Cleared on logout.
 - **UI library**: Angular Material 17 + custom SCSS.
 - **Audio**: Web Audio API — gracefully silent if blocked.
 - **Connection indicator**: Monochrome dot in toolbar (grey = connected, red = reconnecting). No green — keeps the toolbar quiet.
-- **Reconnection**: Auto-reconnects every 2 s after WS close; sends `join` on reconnect.
+- **Reconnection**: Auto-reconnects every 2 s after WS close; sends `join` (with `clientId`) on reconnect — a stale server-side socket from the same browser is displaced automatically, so a dead session can never hold the name hostage.
 - **Browser support**: Modern browsers (Chrome, Firefox, Edge, Safari).
 - **Dev startup**: `npm run dev` starts Angular (port 4200) and Node.js (port 3000) concurrently.
 
@@ -286,6 +294,9 @@ Scrum Poker is inherently real-time and collaborative — full offline play is n
 - **As the SM**, I can click any participant's card (other than my own) to remove them from the session — a confirmation prompt is shown first, the card highlights red on hover as a visual cue, and the participant is immediately removed for all clients.
 - **As a removed participant**, I am shown a "You have been removed from the session" message and returned to the login screen — my session is cleared so I cannot silently rejoin without going through registration again.
 - **As a team**, when a participant closes their tab or loses connectivity their chip dims and shows "offline" — they stay in the room indefinitely so their vote is preserved and they can reconnect at any time without losing state.
+- **As a user whose connection silently timed out**, I can log back in with my **old name** — the server recognises my browser via a persistent client id and replaces the stale connection instead of rejecting the name as "still logged in". *(fixes #13)*
+- **As a team**, participants whose connections died without a proper close are detected by a server heartbeat within about a minute — their chip dims to offline and their name is freed, so no ghost ever stays "online" forever or appears twice.
+- **As a user**, if I open the session in a second window of the same browser under the same name, the newest window wins the session — the older one shows *"Session continued in another window."* and returns to the login bar.
 - **As a team**, when the last participant goes offline the room is automatically destroyed after 30 seconds of being fully empty — so abandoned sessions don't linger on the server.
 
 ### Voting
